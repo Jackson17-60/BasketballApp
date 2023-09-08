@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="17dp"
+        android:paddingEnd="17dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Height In CM"
+            android:textColor="@color/light_black"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:textSize="16sp" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <NumberPicker
+                    android:id="@+id/heightCm"
+                    android:layout_width="150dp"
+                    android:theme="@style/NumberPickerBackground"
+                    android:layout_height="wrap_content" />
+
+                <NumberPicker
+                    android:id="@+id/heightDecimal"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/NumberPickerBackground"/>
+            </LinearLayout>
+            <View
+                android:id="@+id/randomview"
+                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:theme="@style/HeightBackground"
+                android:layout_gravity="center"
+                android:elevation="-1dp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/custom_divider"/>
+</LinearLayout>
+
+

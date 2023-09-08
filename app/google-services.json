@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "162612974797",
+    "project_id": "basketball-3e266",
+    "storage_bucket": "basketball-3e266.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162612974797:android:cf632502c9713f3e124584",
+        "android_client_info": {
+          "package_name": "com.example.cardview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162612974797-qq55bjrc2fhachreribha43i21ph84ar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFWEI3SphygpxKI8FEIO1saf2jUdvj9A0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162612974797-qq55bjrc2fhachreribha43i21ph84ar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

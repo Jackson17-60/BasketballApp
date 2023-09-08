@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Testing</string>
+    <string name="icecream">ice cream so good</string>
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
+    <string name="content_description_media">content deesc</string>
+    <string name="card_title">title</string>
+    <string name="secondary_text">secondary text</string>
+    <string name="supporting_text">supporting text</string>
+    <string name="card_action">card action</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+</resources>

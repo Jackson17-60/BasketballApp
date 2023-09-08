@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="HeightBackground" parent="Theme.MaterialComponents">
+        <item name="android:background">@drawable/height_bg_grey</item>
+    </style>
+
+    <style name="NumberPickerBackground" parent="Theme.MaterialComponents">
+        <item name ="colorAccent">@color/brighter_blue</item>
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="android:textColorPrimary">@color/brighter_blue</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item  name="android:textSize">16sp</item>
+    </style>
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+    </style>
+    <style name="AppBackgroundColor">
+        <item name="android:background">#fcfcfc</item>
+<!--        #fdfdfd-->
+    </style>
+
+
+    <style name="MaterialAlertDialog_rounded" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+    </style>
+
+    <style name="DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/main_blue</item>
+    </style>
+
+    <style name="NeutralButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@android:color/holo_red_light</item>
+    </style>
+</resources>
