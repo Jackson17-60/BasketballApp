@@ -41,7 +41,7 @@ import com.google.firebase.storage.UploadTask;
 public class ProfileFragment extends Fragment {
 
 
-    private TextView locationTv, heightTv, genderTv, levelTv, nameTv,amaTv,beginnerTV,proTv;
+    private TextView locationTv, heightTv, genderTv, levelTv, nameTv;
     private ImageView imageViewProfilePicture;
     private LinearLayout nameLayout,genderLayout,heightLayout,levelLayout,locationLayout;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMediaLauncher;
@@ -54,8 +54,8 @@ public class ProfileFragment extends Fragment {
     NumberPicker heightCm,heightDecimal;
     AlertDialog dialog;
 
-    RadioGroup genderRadioGroup;
-    RadioButton maleRadioButton,femaleRadioButton;
+    RadioGroup genderRadioGroup,levelRadioGroup;
+    RadioButton maleRadioButton,femaleRadioButton,amaBtn,beginnerBtn,proBtn;
     public ProfileFragment(String name , String gender, String height, String level , String location ,String profileImg) {
         this.name = name;
         this.gender = gender;
@@ -63,9 +63,7 @@ public class ProfileFragment extends Fragment {
         this.level = level;
         this.location = location;
         this.profileImg = profileImg;
-        // Required empty public constructor
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +73,7 @@ public class ProfileFragment extends Fragment {
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
-        databaseRef = FirebaseDatabase.getInstance().getReference().child(user.getUid());
+        databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
         pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
@@ -88,8 +86,8 @@ public class ProfileFragment extends Fragment {
                                     @Override
                                     public void onSuccess(Uri downloadUri) {
                                         String imageUrl = downloadUri.toString();
-                                        Toast.makeText(getContext(), "Uploaded Successfully.", Toast.LENGTH_SHORT).show();
-                                        db.child(user.getUid()).child("profileImg").setValue(imageUrl);
+                                        Toast.makeText(requireContext(), "Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                                        db.child("users").child(user.getUid()).child("profileImg").setValue(imageUrl);
 
                                         Glide.with(ProfileFragment.this).load(downloadUri).into(imageViewProfilePicture);
                                     }
@@ -98,7 +96,7 @@ public class ProfileFragment extends Fragment {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(), "Failed to Upload", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Failed to Upload", Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -124,7 +122,6 @@ public class ProfileFragment extends Fragment {
         levelLayout = view.findViewById(R.id.levelLayout);
         locationLayout = view.findViewById(R.id.locationLayout);
         setProfileData(name , gender,  height,  level ,  location,profileImg);
-
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -195,15 +192,15 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = change_name.getText().toString();
-                db.child(user.getUid()).child("name").setValue(newName);
-                Toast.makeText(getContext(), "Name Changed", Toast.LENGTH_SHORT).show();
+                db.child("users").child(user.getUid()).child("name").setValue(newName);
+                Toast.makeText(requireContext(), "Name Changed", Toast.LENGTH_SHORT).show();
             }
         });
         dialog.show();
     }
     private void showGenderDialog() {
         dialog =  createCustomAlertDialog(R.layout.gender_layout);
-        if(gender=="Male"){
+        if(gender.equals("Male")){
             maleRadioButton.setChecked(true);
         }
         else{
@@ -227,7 +224,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("Sex","sex"+selectedSex);
-                db.child(user.getUid()).child("gender").setValue(selectedSex);
+                db.child("users").child(user.getUid()).child("gender").setValue(selectedSex);
             }
         });
 
@@ -256,7 +253,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newHeight = Integer.toString(heightCm.getValue()) + "." + heightDecimal.getValue();
-                db.child(user.getUid()).child("height").setValue(newHeight);
+                db.child("users").child(user.getUid()).child("height").setValue(newHeight);
             }
         });
 
@@ -265,29 +262,37 @@ public class ProfileFragment extends Fragment {
 
     private void showLevelDialog() {
         dialog =  createCustomAlertDialog(R.layout.level_layout);
-        amaTv.setOnClickListener(new View.OnClickListener() {
-                                     @Override
-                                     public void onClick(View view) {
-                                         selectedLevel = "Amateur";
-                                     }
-                                 });
-        beginnerTV.setOnClickListener(new View.OnClickListener() {
+
+        if(level.equals("Beginner")){
+            beginnerBtn.setChecked(true);
+        }
+        else if(level.equals("Amateur")){
+            amaBtn.setChecked(true);
+        }
+        else{
+            proBtn.setChecked(true);
+        }
+        selectedLevel = level;
+        levelRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                selectedLevel = "Beginner";
-            }
-        });
-        proTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedLevel = "Professional";
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.beginner_radiobtn) {
+                    // Male radio button is selected
+                    selectedLevel = "Beginner";
+                    // Do something with the selectedGender value
+                } else if (checkedId == R.id.ama_radiobtn) {
+                    selectedLevel = "Amateur";
+                }
+                else {
+                    selectedLevel = "Professional";
+                }
             }
         });
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                db.child(user.getUid()).child("level").setValue(selectedLevel);
+                db.child("users").child(user.getUid()).child("level").setValue(selectedLevel);
             }
         });
 
@@ -302,8 +307,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newLoc = locationET.getText().toString();
-                db.child(user.getUid()).child("location").setValue(newLoc);
-                Toast.makeText(getContext(), "Location Updated", Toast.LENGTH_SHORT).show();
+                db.child("users").child(user.getUid()).child("location").setValue(newLoc);
+                Toast.makeText(requireContext(), "Location Updated", Toast.LENGTH_SHORT).show();
             }
         });
         dialog.show();
@@ -313,12 +318,13 @@ public class ProfileFragment extends Fragment {
     private AlertDialog createCustomAlertDialog(int layoutResId) {
         View dialogView = LayoutInflater.from(requireContext()).inflate(layoutResId, null);
         locationET = dialogView.findViewById(R.id.locationET);
-        amaTv = dialogView.findViewById(R.id.amaTv);
-        beginnerTV = dialogView.findViewById(R.id.beginnerTV);
-        proTv = dialogView.findViewById(R.id.proTv);
+        amaBtn = dialogView.findViewById(R.id.ama_radiobtn);
+        beginnerBtn = dialogView.findViewById(R.id.beginner_radiobtn);
+        proBtn = dialogView.findViewById(R.id.pro_radiobtn);
         heightCm = dialogView.findViewById(R.id.heightCm);
         heightDecimal = dialogView.findViewById(R.id.heightDecimal);
          genderRadioGroup = dialogView.findViewById(R.id.genderRadioGroup);
+         levelRadioGroup = dialogView.findViewById(R.id.levelRadioGroup);
          maleRadioButton = dialogView.findViewById(R.id.male_radiobtn);
          femaleRadioButton = dialogView.findViewById(R.id.female_radiobtn);
          change_name = dialogView.findViewById(R.id.change_name);

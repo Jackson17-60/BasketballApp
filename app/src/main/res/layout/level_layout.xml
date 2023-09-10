@@ -10,55 +10,101 @@
         android:textColor="@color/black"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:textSize="16sp" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/custom_divider" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/beginnerTV"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        android:textColor="@color/light_black"
-        android:text="Beginner"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/custom_divider" />
-
-    <TextView
-        android:id="@+id/amaTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/levelRadioGroup"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:textColor="@color/light_black"
-        android:layout_gravity="center_horizontal"
-        android:text="Amateur"/>
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/beginner_radiobtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp"
+            android:background="@drawable/custom_radiobtn"
+            android:button="@android:color/transparent"
+            android:text="Beginner" />
 
+        <RadioButton android:id="@+id/ama_radiobtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp"
+            android:background="@drawable/custom_radiobtn"
+            android:button="@android:color/transparent"
+            android:text="Amateur" />
+
+        <RadioButton android:id="@+id/pro_radiobtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp"
+            android:background="@drawable/custom_radiobtn"
+            android:button="@android:color/transparent"
+            android:text="Professional" />
+
+    </RadioGroup>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@drawable/custom_divider" />
-
-    <TextView
-        android:id="@+id/proTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:textColor="@color/light_black"
-        android:layout_gravity="center_horizontal"
-        android:text="Professional"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@drawable/custom_divider" />
+        android:background="@drawable/custom_divider"/>
+    </LinearLayout>
 
-</LinearLayout>
+    <!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@drawable/custom_divider" />-->
+
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/beginnerTV"-->
+<!--        android:layout_marginTop="15dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:textColor="@color/light_black"-->
+<!--        android:text="Beginner"/>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@drawable/custom_divider" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/amaTv"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="15dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:textColor="@color/light_black"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="Amateur"/>-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@drawable/custom_divider" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/proTv"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="15dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:textColor="@color/light_black"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:text="Professional"/>-->
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@drawable/custom_divider" />-->
+<!--    -->
+
+
+

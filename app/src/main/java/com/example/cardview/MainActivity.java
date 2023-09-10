@@ -23,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference databaseRef;
     FirebaseAuth database ;
+    FirebaseFirestore firestore;
     String height,gender, location, level, name,profileImg;
     ProfileFragment profileFragment;
     @Override
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         database = FirebaseAuth.getInstance();
         user = database.getCurrentUser();
-        databaseRef = FirebaseDatabase.getInstance().getReference().child(user.getUid());
+        databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -67,6 +70,22 @@ public class MainActivity extends AppCompatActivity {
                 // Handle any errors here
             }
         });
+
+//        firestore = FirebaseFirestore.getInstance();
+//        firestore.collection("games")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            // Access data from the document
+//                            String gameDate = document.getString("date");
+//                            // Handle the data as needed
+//                        }
+//                    } else {
+//                        // Handle errors
+//                    }
+//                });
+
                 bottomNavigationView.setOnItemSelectedListener(item -> {
 
             int itemId = item.getItemId();

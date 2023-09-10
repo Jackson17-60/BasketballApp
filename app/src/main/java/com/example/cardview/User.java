@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-public class User  implements Parcelable {
+public class User {
     private String email;
     private String password;
     private String name;
@@ -91,38 +91,4 @@ public class User  implements Parcelable {
         this.location = location;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-    protected User(Parcel in) {
-        profileImg = in.readString();
-        name = in.readString();
-        gender = in.readString();
-        height = in.readString();
-        level = in.readString();
-        location = in.readString();
-    }
-
-    // Implement the Parcelable.Creator
-    public static final Creator<User> CREATOR = new Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(gender);
-        dest.writeString(height);
-        dest.writeString(level);
-        dest.writeString(location);
-        dest.writeString(profileImg);
-    }
 }

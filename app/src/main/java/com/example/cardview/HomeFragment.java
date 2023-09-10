@@ -1,65 +1,60 @@
 package com.example.cardview;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class HomeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private RecyclerView recyclerView;
-    private List<CardData> cardDataList;
+    private List<Game> GameData;
+    FloatingActionButton fab ;
+    private LinearLayout datePickerLayout,timePickerLayout,gamesLevelLayout,playerLayout,gamesLocationLayout;
     public HomeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -68,20 +63,117 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
-        LinearLayoutManager lm = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager lm = new LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(lm);
+        fab = view.findViewById(R.id.add_games);
 
 
 
-        // Initialize your cardDataList with CardData objects
-        cardDataList = new ArrayList<>();
-        cardDataList.add(new CardData(R.drawable.mikeedgar, "Title 1", "Secondary Text 1", "Supporting Text 1"));
-        cardDataList.add(new CardData(R.drawable.icecream, "Title 2", "Secondary Text 2", "Supporting Text 2"));
-        // Add more CardData objects as needed
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showBottomSheet();
+            }
+        });
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(cardDataList, getContext());
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        DatabaseReference gamesReference = databaseReference.child("games");
+        List<Game> gameList = new ArrayList<>();
+
+        RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Game game) {
+                // Create a new instance of the bottom sheet fragment
+                GameDetailBottomSheet bottomSheetFragment = new GameDetailBottomSheet(game);
+                bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+            }
+        };
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(gameList,onItemClickListener); // Initialize the adapter once
+
+        gamesReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                gameList.clear();
+
+                for (DataSnapshot gameSnapshot : dataSnapshot.getChildren()) {
+                    DataSnapshot detailsSnapshot = gameSnapshot.child("details");
+                    Game game = detailsSnapshot.getValue(Game.class);
+                    if (game != null) {
+                        gameList.add(game);
+                    }
+                }
+                Collections.reverse(gameList);
+
+                adapter.notifyDataSetChanged();
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any errors here
+            }
+        });
+        gamesReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                String gameId = dataSnapshot.getKey();
+
+                DataSnapshot participantsSnapshot = dataSnapshot.child("participants");
+                long participantCount = participantsSnapshot.getChildrenCount();
+
+                if (gameId != null) {
+                    gamesReference.child(gameId).child("details").child("participantCount").setValue(participantCount).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // Find the game in your list and update the participant count
+                            for (Game game : gameList) {
+                                if (game.getGameID().equals(gameId)) {
+                                    game.setParticipantCount(participantCount);
+
+                                    adapter.notifyItemChanged(gameList.indexOf(game));
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+
+        });
+
+
         recyclerView.setAdapter(adapter);
+
+
 
         return view;
     }
+    public void showBottomSheet() {
+        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.games_layout);
+        bottomSheet.show(getActivity().getSupportFragmentManager(), bottomSheet.getTag());
+    }
+
+
 }
