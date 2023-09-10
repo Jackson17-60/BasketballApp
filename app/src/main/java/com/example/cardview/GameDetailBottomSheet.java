@@ -21,7 +21,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
     String name;
-    long participantCount;
     private Game game;
     public GameDetailBottomSheet(Game game){
         this.game = game;
@@ -44,7 +43,6 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         TextView hostTextView = view.findViewById(R.id.game_detail_host);
         DatabaseReference databaseRef;
         databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(game.getHost());
-
 
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

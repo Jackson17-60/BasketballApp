@@ -30,7 +30,8 @@
             android:button="@android:color/transparent"
             android:text="Beginner" />
 
-        <RadioButton android:id="@+id/ama_radiobtn"
+        <RadioButton
+            android:id="@+id/ama_radiobtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="35dp"
@@ -55,56 +56,6 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/custom_divider"/>
     </LinearLayout>
-
-    <!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:background="@drawable/custom_divider" />-->
-
-<!--    <TextView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/beginnerTV"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:layout_marginBottom="15dp"-->
-<!--        android:layout_gravity="center_horizontal"-->
-<!--        android:textColor="@color/light_black"-->
-<!--        android:text="Beginner"/>-->
-
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:background="@drawable/custom_divider" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/amaTv"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:layout_marginBottom="15dp"-->
-<!--        android:textColor="@color/light_black"-->
-<!--        android:layout_gravity="center_horizontal"-->
-<!--        android:text="Amateur"/>-->
-
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:background="@drawable/custom_divider" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/proTv"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:layout_marginBottom="15dp"-->
-<!--        android:textColor="@color/light_black"-->
-<!--        android:layout_gravity="center_horizontal"-->
-<!--        android:text="Professional"/>-->
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:background="@drawable/custom_divider" />-->
-<!--    -->
 
 
 

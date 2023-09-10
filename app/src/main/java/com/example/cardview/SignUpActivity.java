@@ -82,7 +82,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 // Registration successful, user account is created and authenticated
                                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                                 FirebaseUser newUser = task.getResult().getUser();
-                                User user = new User("","test","male","170","noob","SD");
+                                User user = new User("","Set Name","Set Gender","Set Height","Set Level","Set Location");
                                 db.child("users").child(newUser.getUid()).setValue(user);
 
                                 Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);

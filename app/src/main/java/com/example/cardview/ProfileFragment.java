@@ -1,5 +1,7 @@
 package com.example.cardview;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -49,13 +52,9 @@ public class ProfileFragment extends Fragment {
     FirebaseUser user;
     DatabaseReference db;
     DatabaseReference databaseRef;
-    String height,gender, location, level, name,profileImg,selectedSex,selectedLevel;
-    EditText locationET,change_name;
-    NumberPicker heightCm,heightDecimal;
-    AlertDialog dialog;
-
-    RadioGroup genderRadioGroup,levelRadioGroup;
-    RadioButton maleRadioButton,femaleRadioButton,amaBtn,beginnerBtn,proBtn;
+    String height,gender, location, level, name,profileImg;
+    Activity activity;
+    private DatabaseReference userDatabaseRef;
     public ProfileFragment(String name , String gender, String height, String level , String location ,String profileImg) {
         this.name = name;
         this.gender = gender;
@@ -65,51 +64,80 @@ public class ProfileFragment extends Fragment {
         this.profileImg = profileImg;
     }
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof Activity){
+            activity = (Activity) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        activity = null;
+    }
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize Firebase Auth and Database reference
         database = FirebaseAuth.getInstance();
         user = database.getCurrentUser();
         db = FirebaseDatabase.getInstance().getReference();
+        userDatabaseRef = db.child("users").child(user.getUid());
 
+        // Initialize Firebase Storage reference
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
-        databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
+
+        // Ensure user is not null to avoid NullPointerException in subsequent code
+        if(user != null) {
+            databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
+        }
+
 
         pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
                 Log.d("PhotoPicker", "Selected URI: " + uri);
-                storageRef.child(user.getUid()).putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        storageRef.child(user.getUid()).getDownloadUrl()
-                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri downloadUri) {
-                                        String imageUrl = downloadUri.toString();
-                                        Toast.makeText(requireContext(), "Uploaded Successfully.", Toast.LENGTH_SHORT).show();
-                                        db.child("users").child(user.getUid()).child("profileImg").setValue(imageUrl);
-
-                                        Glide.with(ProfileFragment.this).load(downloadUri).into(imageViewProfilePicture);
-                                    }
-                                });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(requireContext(), "Failed to Upload", Toast.LENGTH_SHORT).show();
-
+                storageRef.child(user.getUid()).putFile(uri).addOnSuccessListener(taskSnapshot ->
+                        storageRef.child(user.getUid()).getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                            String imageUrl = downloadUri.toString();
+                            if (activity != null) {
+                                Toast.makeText(activity, getString(R.string.upload_success), Toast.LENGTH_SHORT).show();
+                            }
+                            db.child("users").child(user.getUid()).child("profileImg").setValue(imageUrl);
+                            if (isAdded()) { // Ensure the fragment is attached to an activity
+                                Glide.with(ProfileFragment.this)
+                                        .load(downloadUri)
+                                        .into(imageViewProfilePicture);
+                            }
+                        })
+                ).addOnFailureListener(e -> {
+                    if (activity != null) {
+                        Toast.makeText(activity, getString(R.string.upload_failed), Toast.LENGTH_SHORT).show();
                     }
                 });
-
             }
         });
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (isAdded()) {
+            // Load image with Glide
+            Glide.with(this)
+                    .load(profileImg)
+                    .into(imageViewProfilePicture);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Initialize views
         locationTv = view.findViewById(R.id.locationTextView);
         nameTv = view.findViewById(R.id.nameTextView);
         levelTv = view.findViewById(R.id.levelTextView);
@@ -121,21 +149,40 @@ public class ProfileFragment extends Fragment {
         heightLayout = view.findViewById(R.id.heightLayout);
         levelLayout = view.findViewById(R.id.levelLayout);
         locationLayout = view.findViewById(R.id.locationLayout);
-        setProfileData(name , gender,  height,  level ,  location,profileImg);
+
+        setProfileData(name, gender, height, level, location, profileImg);
+        // Fetch and set profile data from Firebase
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    // Retrieve the user's data
-                    gender = dataSnapshot.child("gender").getValue(String.class);
-                    height = dataSnapshot.child("height").getValue(String.class);
-                    level = dataSnapshot.child("level").getValue(String.class);
-                    location = dataSnapshot.child("location").getValue(String.class);
-                    name = dataSnapshot.child("name").getValue(String.class);
-                    profileImg = dataSnapshot.child("profileImg").getValue(String.class);
-                }
-                setProfileData(gender, height, level, location, name, profileImg);
 
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (isAdded()) {
+                if (dataSnapshot.exists()) {
+                    if (dataSnapshot.hasChild("gender")) {
+                        gender = dataSnapshot.child("gender").getValue(String.class);
+                        genderTv.setText(gender);
+                    }
+                    if (dataSnapshot.hasChild("height")) {
+                        height = dataSnapshot.child("height").getValue(String.class);
+                        heightTv.setText(getString(R.string.height_format, height));
+                    }
+                    if (dataSnapshot.hasChild("level")) {
+                        level = dataSnapshot.child("level").getValue(String.class);
+                        levelTv.setText(level);
+                    }
+                    if (dataSnapshot.hasChild("location")) {
+                        location = dataSnapshot.child("location").getValue(String.class);
+                        locationTv.setText(location);
+                    }
+                    if (dataSnapshot.hasChild("name")) {
+                        name = dataSnapshot.child("name").getValue(String.class);
+                        nameTv.setText(name);
+                    }
+                    if (dataSnapshot.hasChild("profileImg")) {
+                        profileImg = dataSnapshot.child("profileImg").getValue(String.class);
+                        Glide.with(ProfileFragment.this).load(profileImg).into(imageViewProfilePicture);
+                    }
+                }}
             }
 
             @Override
@@ -143,210 +190,250 @@ public class ProfileFragment extends Fragment {
                 // Handle any errors here
             }
         });
-        imageViewProfilePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
+
+        imageViewProfilePicture.setOnClickListener(view1 ->
                 pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build());
-            }
-        });
-        nameLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showNameDialog();
-            }
-        });
-        genderLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showGenderDialog();
-            }
-        });
-        heightLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showHeightDialog();
-            }
-        });
-        levelLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showLevelDialog();
-            }
-        });
-        locationLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showLocationDialog();
-            }
-        });
+                        .build())
+        );
+        setupClickListeners(view);
+
         return view;
     }
 
     private void showNameDialog() {
-        dialog =  createCustomAlertDialog(R.layout.name_layout);
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.name_layout, null);
+        EditText change_name = dialogView.findViewById(R.id.change_name);
         change_name.setHint(name);
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newName = change_name.getText().toString();
-                db.child("users").child(user.getUid()).child("name").setValue(newName);
-                Toast.makeText(requireContext(), "Name Changed", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                .setView(dialogView)
+                .setNeutralButton("Cancel", (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton("Confirm", (dialogInterface, which) -> {
+                    String newName = change_name.getText().toString();
+                    if (!newName.isEmpty()) {
+                        userDatabaseRef.child("name").setValue(newName);
+                            Toast.makeText(requireContext(), getString(R.string.name_changed), Toast.LENGTH_SHORT).show();
+                    } else {
+                            Toast.makeText(requireContext(), getString(R.string.name_empty_error), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
         dialog.show();
     }
     private void showGenderDialog() {
-        dialog =  createCustomAlertDialog(R.layout.gender_layout);
-        if(gender.equals("Male")){
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.gender_layout, null);
+        RadioGroup genderRadioGroup = dialogView.findViewById(R.id.genderRadioGroup);
+        RadioButton maleRadioButton = dialogView.findViewById(R.id.male_radiobtn);
+        RadioButton femaleRadioButton = dialogView.findViewById(R.id.female_radiobtn);
+
+        if (gender.equals("Male")) {
             maleRadioButton.setChecked(true);
-        }
-        else{
+        } else {
             femaleRadioButton.setChecked(true);
         }
-        selectedSex = gender;
-        genderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.male_radiobtn) {
-                    // Male radio button is selected
-                    selectedSex = "Male";
-                    // Do something with the selectedGender value
-                } else if (checkedId == R.id.female_radiobtn) {
-                    selectedSex = "Female";
-                }
-            }
-        });
 
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d("Sex","sex"+selectedSex);
-                db.child("users").child(user.getUid()).child("gender").setValue(selectedSex);
-            }
-        });
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                .setView(dialogView)
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    int selectedId = genderRadioGroup.getCheckedRadioButtonId();
+                    String selectedGender = ((RadioButton) dialogView.findViewById(selectedId)).getText().toString();
+                    db.child("users").child(user.getUid()).child("gender").setValue(selectedGender);
 
+                        Toast.makeText(requireContext(), getString(R.string.gender_updated), Toast.LENGTH_SHORT).show();
+
+                })
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
         dialog.show();
     }
+
     private void showHeightDialog() {
-        dialog =  createCustomAlertDialog(R.layout.height_picker);
-        heightCm.setMaxValue(240);
-        heightCm.setMinValue(80);
-        heightCm.setValue(170);
-        String[] decimalValues = new String[] {".0", "0.1", "0.2", "0.3", "0.4","0.5","0.6","0.7","0.8","0.9" };
-        heightDecimal.setMinValue(0);  // Set the minimum value
-        heightDecimal.setMaxValue(9); // Set the maximum value
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.height_picker, null);
+        NumberPicker heightCm = dialogView.findViewById(R.id.heightCm);
+        NumberPicker heightDecimal = dialogView.findViewById(R.id.heightDecimal);
+
+        final int MAX_HEIGHT = 240;
+        final int MIN_HEIGHT = 80;
+        final int DEFAULT_HEIGHT = 170;
+
+        heightCm.setMaxValue(MAX_HEIGHT);
+        heightCm.setMinValue(MIN_HEIGHT);
+        heightCm.setValue(DEFAULT_HEIGHT);
+
+        String[] decimalValues = new String[]{".0", ".1", ".2", ".3", ".4", ".5", ".6", ".7", ".8", ".9"};
+        heightDecimal.setMinValue(0);
+        heightDecimal.setMaxValue(9);
         heightDecimal.setDisplayedValues(decimalValues);
-        if(height.contains(".")){
-            String[] parts = height.split("\\.");
-            heightCm.setValue(Integer.parseInt(parts[0]));
-            heightDecimal.setValue(Integer.parseInt(parts[1]));
-        }
-        else{
-            heightCm.setValue(Integer.parseInt(height));
+
+        try {
+            if (height.contains(".")) {
+                String[] parts = height.split("\\.");
+                heightCm.setValue(Integer.parseInt(parts[0]));
+                heightDecimal.setValue(Integer.parseInt(parts[1]));
+            } else {
+                heightCm.setValue(Integer.parseInt(height));
+                heightDecimal.setValue(0);
+            }
+        } catch (NumberFormatException e) {
+            Log.e("ProfileFragment", "Invalid height format: " + height, e);
+            // Set to default values in case of an error
+            heightCm.setValue(DEFAULT_HEIGHT);
             heightDecimal.setValue(0);
         }
 
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newHeight = Integer.toString(heightCm.getValue()) + "." + heightDecimal.getValue();
-                db.child("users").child(user.getUid()).child("height").setValue(newHeight);
-            }
-        });
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                .setView(dialogView)
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    String newHeight = Integer.toString(heightCm.getValue()) + decimalValues[heightDecimal.getValue()];
+                    db.child("users").child(user.getUid()).child("height").setValue(newHeight);
+                        Toast.makeText(requireContext(), getString(R.string.height_updated), Toast.LENGTH_SHORT).show();
 
+                })
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
         dialog.show();
     }
 
     private void showLevelDialog() {
-        dialog =  createCustomAlertDialog(R.layout.level_layout);
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.level_layout, null);
 
-        if(level.equals("Beginner")){
-            beginnerBtn.setChecked(true);
-        }
-        else if(level.equals("Amateur")){
-            amaBtn.setChecked(true);
-        }
-        else{
-            proBtn.setChecked(true);
-        }
-        selectedLevel = level;
-        levelRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.beginner_radiobtn) {
-                    // Male radio button is selected
-                    selectedLevel = "Beginner";
-                    // Do something with the selectedGender value
-                } else if (checkedId == R.id.ama_radiobtn) {
-                    selectedLevel = "Amateur";
-                }
-                else {
-                    selectedLevel = "Professional";
-                }
-            }
-        });
+        RadioGroup levelRadioGroup = dialogView.findViewById(R.id.levelRadioGroup);
+        RadioButton beginnerBtn = dialogView.findViewById(R.id.beginner_radiobtn);
+        RadioButton amaBtn = dialogView.findViewById(R.id.ama_radiobtn);
+        RadioButton proBtn = dialogView.findViewById(R.id.pro_radiobtn);
 
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                db.child("users").child(user.getUid()).child("level").setValue(selectedLevel);
-            }
-        });
+        // Set the current level on the radio group
+        setInitialLevelSelection(level, beginnerBtn, amaBtn, proBtn);
 
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                .setView(dialogView)
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    int selectedId = levelRadioGroup.getCheckedRadioButtonId();
+                    String selectedLevel = getSelectedLevel(selectedId, beginnerBtn, amaBtn, proBtn);
+                    db.child("users").child(user.getUid()).child("level").setValue(selectedLevel);
+                        Toast.makeText(requireContext(), getString(R.string.level_updated), Toast.LENGTH_SHORT).show();
+                })
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
         dialog.show();
+    }
+
+    private void setInitialLevelSelection(String currentLevel, RadioButton beginnerBtn, RadioButton amaBtn, RadioButton proBtn) {
+        switch (currentLevel) {
+            case "Beginner":
+                beginnerBtn.setChecked(true);
+                break;
+            case "Amateur":
+                amaBtn.setChecked(true);
+                break;
+            case "Professional":
+                proBtn.setChecked(true);
+                break;
+            default:
+                beginnerBtn.setChecked(false);
+                amaBtn.setChecked(false);
+                proBtn.setChecked(false);
+                break;
+        }
+    }
+
+    private String getSelectedLevel(int selectedId, RadioButton beginnerBtn, RadioButton amaBtn, RadioButton proBtn) {
+        if (selectedId == beginnerBtn.getId()) {
+            return "Beginner";
+        } else if (selectedId == amaBtn.getId()) {
+            return "Amateur";
+        } else if (selectedId == proBtn.getId()) {
+            return "Professional";
+        }
+        return "Beginner";  // Default value
     }
 
     private void showLocationDialog() {
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.location_layout, null);
+        EditText locationET = dialogView.findViewById(R.id.locationET);
 
-        AlertDialog dialog =  createCustomAlertDialog(R.layout.location_layout);
-        locationET.setHint(location);
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newLoc = locationET.getText().toString();
-                db.child("users").child(user.getUid()).child("location").setValue(newLoc);
-                Toast.makeText(requireContext(), "Location Updated", Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show();
-    }
+        if (location != null) {
+            locationET.setHint(location);
+        }
 
-
-    private AlertDialog createCustomAlertDialog(int layoutResId) {
-        View dialogView = LayoutInflater.from(requireContext()).inflate(layoutResId, null);
-        locationET = dialogView.findViewById(R.id.locationET);
-        amaBtn = dialogView.findViewById(R.id.ama_radiobtn);
-        beginnerBtn = dialogView.findViewById(R.id.beginner_radiobtn);
-        proBtn = dialogView.findViewById(R.id.pro_radiobtn);
-        heightCm = dialogView.findViewById(R.id.heightCm);
-        heightDecimal = dialogView.findViewById(R.id.heightDecimal);
-         genderRadioGroup = dialogView.findViewById(R.id.genderRadioGroup);
-         levelRadioGroup = dialogView.findViewById(R.id.levelRadioGroup);
-         maleRadioButton = dialogView.findViewById(R.id.male_radiobtn);
-         femaleRadioButton = dialogView.findViewById(R.id.female_radiobtn);
-         change_name = dialogView.findViewById(R.id.change_name);
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
                 .setView(dialogView)
-                .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    String newLoc = locationET.getText().toString();
+                    if (!newLoc.isEmpty()) {
+                        db.child("users").child(user.getUid()).child("location").setValue(newLoc)
+                                .addOnSuccessListener(aVoid ->
+                                        Toast.makeText(requireContext(), getString(R.string.location_updated), Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e -> Toast.makeText(requireContext(), getString(R.string.location_update_failed), Toast.LENGTH_SHORT).show());
+                    } else {
+                            Toast.makeText(requireContext(), getString(R.string.location_empty_error), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        return dialog;
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
+        dialog.show();
     }
+    private void setupClickListeners(View view) {
+        imageViewProfilePicture.setOnClickListener(v ->
+                pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build())
+        );
+
+        nameLayout.setOnClickListener(v -> showNameDialog());
+        genderLayout.setOnClickListener(v -> showGenderDialog());
+        heightLayout.setOnClickListener(v -> showHeightDialog());
+        levelLayout.setOnClickListener(v -> showLevelDialog());
+        locationLayout.setOnClickListener(v -> showLocationDialog());
+    }
+
     public void setProfileData(String gender, String height, String level, String location, String name, String profileImg) {
-        genderTv.setText(gender);
-        heightTv.setText(height + " cm");
-        levelTv.setText(level);
-        locationTv.setText(location);
-        nameTv.setText(name);
-        Glide.with(ProfileFragment.this).load(profileImg).into(imageViewProfilePicture);
+        if (gender != null && !gender.isEmpty()) {
+            genderTv.setText(gender);
+        }
+
+        if (height != null && !height.isEmpty()) {
+            String heightText = getString(R.string.height_format, height);
+            heightTv.setText(heightText);
+        }
+
+        if (level != null && !level.isEmpty()) {
+            levelTv.setText(level);
+        }
+
+        if (location != null && !location.isEmpty()) {
+            locationTv.setText(location);
+        }
+
+        if (name != null && !name.isEmpty()) {
+            nameTv.setText(name);
+        }
+
+        if (profileImg != null && !profileImg.isEmpty()) {
+            Glide.with(ProfileFragment.this).load(profileImg).into(imageViewProfilePicture);
+        }
     }
 
 }

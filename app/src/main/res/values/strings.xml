@@ -16,4 +16,20 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="select_time">"Select Time"</string>
+    <string name="select_date">"Select Date"</string>
+    <string name="name_changed">Name Changed</string>
+    <string name="name_empty_error">Name Not Changed</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="gender_updated">Gender Updated</string>
+    <string name="height_updated">Height Updated</string>
+    <string name="level_updated">Level Updated</string>
+    <string name="location_updated">Location Updated</string>
+    <string name="location_update_failed">Failed to update location. Please try again.</string>
+    <string name="location_empty_error">Location cannot be empty.</string>
+    <string name="height_format">%s cm</string>
+    <string name="upload_success">Uploaded Successfully.</string>
+    <string name="upload_failed">Failed to Upload</string>
+
 </resources>

@@ -1,8 +1,5 @@
 package com.example.cardview;
 
-import android.app.Dialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,42 +9,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private List<Game> GameData;
     FloatingActionButton fab ;
-    private LinearLayout datePickerLayout,timePickerLayout,gamesLevelLayout,playerLayout,gamesLocationLayout;
     public HomeFragment() {
-        // Required empty public constructor
     }
 
 
@@ -77,9 +58,8 @@ public class HomeFragment extends Fragment {
         });
 
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-        DatabaseReference gamesReference = databaseReference.child("games");
+        DatabaseReference gamesReference = FirebaseDatabase.getInstance().getReference().child("games");
         List<Game> gameList = new ArrayList<>();
 
         RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
@@ -92,86 +72,67 @@ public class HomeFragment extends Fragment {
         };
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(gameList,onItemClickListener); // Initialize the adapter once
 
-        gamesReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                gameList.clear();
-
-                for (DataSnapshot gameSnapshot : dataSnapshot.getChildren()) {
-                    DataSnapshot detailsSnapshot = gameSnapshot.child("details");
-                    Game game = detailsSnapshot.getValue(Game.class);
-                    if (game != null) {
-                        gameList.add(game);
-                    }
-                }
-                Collections.reverse(gameList);
-
-                adapter.notifyDataSetChanged();
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle any errors here
-            }
-        });
         gamesReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                DataSnapshot detailsSnapshot = dataSnapshot.child("details");
+                Game game = detailsSnapshot.getValue(Game.class);
+                if (game != null) {
+                    gameList.add(0, game); // Adding game at the start of the list
+                    adapter.notifyItemInserted(0);
+                    recyclerView.scrollToPosition(0); // Automatically scroll to the top to show the new item
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 String gameId = dataSnapshot.getKey();
-
+                DataSnapshot detailsSnapshot = dataSnapshot.child("details");
+                Game game = detailsSnapshot.getValue(Game.class);
                 DataSnapshot participantsSnapshot = dataSnapshot.child("participants");
                 long participantCount = participantsSnapshot.getChildrenCount();
 
-                if (gameId != null) {
-                    gamesReference.child(gameId).child("details").child("participantCount").setValue(participantCount).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // Find the game in your list and update the participant count
-                            for (Game game : gameList) {
-                                if (game.getGameID().equals(gameId)) {
-                                    game.setParticipantCount(participantCount);
-
-                                    adapter.notifyItemChanged(gameList.indexOf(game));
-                                    break;
-                                }
-                            }
+                if (game != null && gameId != null) {
+                    for (int i = 0; i < gameList.size(); i++) {
+                        if (gameList.get(i).getGameID().equals(gameId)) {
+                            game.setParticipantCount(participantCount);
+                            gameList.set(i, game);
+                            adapter.notifyItemChanged(i);
+                            break;
                         }
-                    });
+                    }
                 }
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                String gameId = dataSnapshot.getKey();
+                for (int i = 0; i < gameList.size(); i++) {
+                    if (gameList.get(i).getGameID().equals(gameId)) {
+                        gameList.remove(i);
+                        adapter.notifyItemRemoved(i);
+                        break;
+                    }
+                }
             }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                // Handle child moved if necessary
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error retrieving data", databaseError.toException());
             }
-
         });
 
-
         recyclerView.setAdapter(adapter);
-
-
 
         return view;
     }
     public void showBottomSheet() {
-        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.games_layout);
+        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout);
         bottomSheet.show(getActivity().getSupportFragmentManager(), bottomSheet.getTag());
     }
 

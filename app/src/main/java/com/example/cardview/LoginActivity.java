@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseApp.initializeApp(LoginActivity.this);
                 FirebaseAuth database = FirebaseAuth.getInstance();
 //                database.signInWithEmailAndPassword(email, password)
-                database.signInWithEmailAndPassword("1@gmail.com", "123456")
+                database.signInWithEmailAndPassword("a1@gmail.com", "123456")
                         .addOnCompleteListener(LoginActivity.this, task -> {
                             if (task.isSuccessful()) {
                                 // Sign-in successful, user is authenticated
