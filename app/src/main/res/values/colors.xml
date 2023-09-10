@@ -17,6 +17,7 @@
     <color name="bottomTabInactive">#DBDBDB</color>
     <color name="lighter_black">#565656</color>
     <color name="light_grey">#fdfdfd</color>
+    <color name="red">#FF2D2D</color>
 
 <!--#0575E6-->
 </resources>
