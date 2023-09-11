@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,7 +55,8 @@ public class HomeFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showBottomSheet();
+                CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout, null);
+                bottomSheet.show(getActivity().getSupportFragmentManager(), "CustomBottomSheet");
             }
         });
 
@@ -65,9 +68,22 @@ public class HomeFragment extends Fragment {
         RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Game game) {
-                // Create a new instance of the bottom sheet fragment
-                GameDetailBottomSheet bottomSheetFragment = new GameDetailBottomSheet(game);
-                bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (currentUser != null) {
+                    String currentUserId = currentUser.getUid();
+
+                    if (currentUserId.equals(game.getHost())) {
+                        // Current user is the host
+                        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout, game);
+                        bottomSheet.show(getActivity().getSupportFragmentManager(), bottomSheet.getTag());
+                    } else {
+                        // Current user is not the host
+                        GameDetailBottomSheet bottomSheetFragment = new GameDetailBottomSheet(game);
+                        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+                    }
+                } else {
+                    // Handle the case where the current user is null (not authenticated)
+                }
             }
         };
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(gameList,onItemClickListener); // Initialize the adapter once
@@ -131,10 +147,10 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
-    public void showBottomSheet() {
-        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout);
-        bottomSheet.show(getActivity().getSupportFragmentManager(), bottomSheet.getTag());
-    }
+//    public void showBottomSheet(Game game) {
+//        CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout,game);
+//        bottomSheet.show(getActivity().getSupportFragmentManager(), bottomSheet.getTag());
+//    }
 
 
 }

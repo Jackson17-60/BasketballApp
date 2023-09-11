@@ -32,4 +32,12 @@
     <string name="upload_success">Uploaded Successfully.</string>
     <string name="upload_failed">Failed to Upload</string>
 
+
+    <string name="add_game">Add Game</string>
+    <string name="date_label">Date</string>
+    <string name="time_label">Time</string>
+    <string name="location_label">Location</string>
+    <string name="players_needed_label">Players Needed</string>
+    <string name="level_label">Level</string>
+
 </resources>

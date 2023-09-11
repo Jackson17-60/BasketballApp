@@ -2,12 +2,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gameLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    android:id="@+id/gameLayout">
+    android:padding="14dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+
+<com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:id="@+id/drag_handle"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
@@ -27,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:text="Add Game"
+            android:text="@string/add_game"
             android:textColor="@color/light_black"
             android:textSize="18sp" />
 
@@ -174,13 +176,7 @@
 
             <LinearLayout
                 android:id="@+id/gamesLocationLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
+                style="@style/GameLayoutStyle">
 
                 <!-- Left side: First ImageView and TextView -->
                 <LinearLayout
@@ -234,13 +230,7 @@
 
             <LinearLayout
                 android:id="@+id/playerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
+                style="@style/GameLayoutStyle">
 
                 <!-- Left side: First ImageView and TextView -->
                 <LinearLayout
@@ -294,13 +284,7 @@
 
             <LinearLayout
                 android:id="@+id/gamesLevelLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
+                style="@style/GameLayoutStyle">
 
                 <!-- Left side: First ImageView and TextView -->
                 <LinearLayout
@@ -327,7 +311,7 @@
 
                 <!-- Right side: Second TextView and ImageView -->
                 <RelativeLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp">
 
@@ -335,10 +319,8 @@
                         android:id="@+id/gamelevelRadioGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
                         android:orientation="horizontal"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp">
+                        android:layout_marginLeft="25dp">
 
                         <RadioButton
                             android:id="@+id/game_beginner_radiobtn"
@@ -346,8 +328,8 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp"
+                            android:paddingStart="15dp"
+                            android:paddingEnd="15dp"
                             android:text="Beginner" />
 
                         <RadioButton
@@ -356,8 +338,8 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp"
+                            android:paddingStart="15dp"
+                            android:paddingEnd="15dp"
                             android:text="Amateur" />
 
                         <RadioButton
@@ -366,26 +348,44 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp"
+                            android:paddingStart="15dp"
+                            android:paddingEnd="15dp"
                             android:text="Professional" />
 
                     </RadioGroup>
 
 
                 </RelativeLayout>
-
                 <Button
                     android:id="@+id/addgame_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:backgroundTint="@color/light_blue"
                     android:text="CONFIRM"
-                    android:layout_marginTop="20dp"
                     android:textColor="#ffffff"
                     android:textSize="16sp" />
+                <Button
+                    android:id="@+id/delete_game_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete Game"
+                    android:textColor="#ffffff"
+                    android:backgroundTint="@color/red"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    android:layout_marginTop="10dp"/>
+
+
             </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
-
+    <ProgressBar
+        android:id="@+id/loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleLarge"/>
 </FrameLayout>
