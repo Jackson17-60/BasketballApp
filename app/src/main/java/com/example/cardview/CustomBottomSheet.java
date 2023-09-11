@@ -52,7 +52,7 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     private String selectedLevel, addDate, addTime, addGameLoc, addPlayers;
     private RadioGroup levelRadioGroup;
     private Button addGameBtn,deleteGameBtn;
-    private TextView dateTv, timeTv;
+    private TextView dateTv, timeTv,gameStatus;
     private EditText gameLocationET, playersNeededET;
     private DatabaseReference gamesReference;
     private FirebaseUser user;
@@ -84,6 +84,7 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         timeTv = rootView.findViewById(R.id.gameTimeText);
         addGameBtn = rootView.findViewById(R.id.addgame_btn);
         deleteGameBtn = rootView.findViewById(R.id.delete_game_btn);
+        gameStatus = rootView.findViewById(R.id.gameStatus);
         loadingIndicator = rootView.findViewById(R.id.loading_indicator);
         if (existingGame != null) {
             populateFieldsForEditing(existingGame);
@@ -332,12 +333,14 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         setupClickListeners(rootView);
         setupLevelRadioGroupListener();
         if (existingGame != null) {
+            gameStatus.setText(R.string.edit_game);
             deleteGameBtn.setVisibility(View.VISIBLE);
             populateFieldsForEditing(existingGame);
         }
         return rootView;
     }
     private void populateFieldsForEditing(Game game) {
+
         dateTv.setText(game.getDate());
         timeTv.setText(game.getTime());
         gameLocationET.setText(game.getLocation());

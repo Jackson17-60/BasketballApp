@@ -32,7 +32,7 @@
     <string name="upload_success">Uploaded Successfully.</string>
     <string name="upload_failed">Failed to Upload</string>
 
-
+    <string name="edit_game">Edit Game</string>
     <string name="add_game">Add Game</string>
     <string name="date_label">Date</string>
     <string name="time_label">Time</string>

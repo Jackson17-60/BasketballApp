@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,11 +36,15 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnDataChangeListener {
 
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private List<Game> gameList = new ArrayList<>();
+    private List<Game> gameListFull = new ArrayList<>();
+    private String currentFilter = null;
+
+
     private RecyclerViewAdapter adapter;
     private final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.US);
     DatabaseReference gamesReference;
@@ -77,10 +84,24 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        setupFirebaseDatabase();
+        setupRecyclerViewAndAdapter(view);
+        setupFab(view);
+        setupLevelFilterSpinner(view);
+
+        return view;
+    }
+    private void setupRecyclerViewAndAdapter(View view) {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-        fab = view.findViewById(R.id.add_games);
 
+        adapter = new RecyclerViewAdapter(gameList, getOnItemClickListener());
+        adapter.setOnDataChangeListener(this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void setupFab(View view) {
+        fab = view.findViewById(R.id.add_games);
         fab.setOnClickListener(view1 -> {
             FragmentActivity activity = getActivity();
             if (activity != null) {
@@ -90,66 +111,41 @@ public class HomeFragment extends Fragment {
                 Log.e("HomeFragment", "Activity is null");
             }
         });
-
-        setupFirebaseDatabase();
-        adapter = new RecyclerViewAdapter(gameList, getOnItemClickListener());
-        recyclerView.setAdapter(adapter);
-        return view;
     }
+    private void setupLevelFilterSpinner(View view) {
+        Spinner levelFilterSpinner = view.findViewById(R.id.levelFilterSpinner);
+        levelFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentFilter = (String) parent.getItemAtPosition(position);
+                if ("All Levels".equals(currentFilter)) {
+                    currentFilter = null;
+                }
+                adapter.getFilter().filter(currentFilter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
     private void setupFirebaseDatabase() {
         gamesReference = FirebaseDatabase.getInstance().getReference().child("games");
         gamesReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                DataSnapshot detailsSnapshot = dataSnapshot.child("details");
-                Game game = detailsSnapshot.getValue(Game.class);
-
-                if (game != null) {
-                    try {
-                        Date gameDate = sdf.parse(game.getDate() + " " + game.getTime());
-                        Date currentDate = new Date();
-
-                        if (gameDate != null && gameDate.after(currentDate)) {
-                            gameList.add(0, game); // Adding game at the start of the list
-                            adapter.notifyItemInserted(0);
-                            recyclerView.scrollToPosition(0); // Automatically scroll to the top to show the new item
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
+                handleChildAdded(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                String gameId = dataSnapshot.getKey();
-                DataSnapshot detailsSnapshot = dataSnapshot.child("details");
-                Game game = detailsSnapshot.getValue(Game.class);
-                DataSnapshot participantsSnapshot = dataSnapshot.child("participants");
-                long participantCount = participantsSnapshot.getChildrenCount();
-
-                if (game != null && gameId != null) {
-                    for (int i = 0; i < gameList.size(); i++) {
-                        if (gameList.get(i).getGameID().equals(gameId)) {
-                            game.setParticipantCount(participantCount);
-                            gameList.set(i, game);
-                            adapter.notifyItemChanged(i);
-                            break;
-                        }
-                    }
-                }
+                handleChildChanged(dataSnapshot);
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                String gameId = dataSnapshot.getKey();
-                for (int i = 0; i < gameList.size(); i++) {
-                    if (gameList.get(i).getGameID().equals(gameId)) {
-                        gameList.remove(i);
-                        adapter.notifyItemRemoved(i);
-                        break;
-                    }
-                }
+                handleChildRemoved(dataSnapshot);
             }
 
             @Override
@@ -163,6 +159,81 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+    private void handleChildAdded(DataSnapshot dataSnapshot) {
+        DataSnapshot detailsSnapshot = dataSnapshot.child("details");
+        Game game = detailsSnapshot.getValue(Game.class);
+
+        if (game != null) {
+            try {
+                addGameToTheList(game);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Log.e("Firebase", "Error parsing date", e);
+            }
+        } else {
+            Log.d("Firebase", "Game is null");
+        }
+    }
+
+    private void addGameToTheList(Game game) throws ParseException {
+        Date gameDate = sdf.parse(game.getDate() + " " + game.getTime());
+        Date currentDate = new Date();
+
+        if (gameDate != null && gameDate.after(currentDate)) {
+            gameList.add(0, game);
+            gameListFull.add(0, game);
+            adapter.updateData(gameListFull);
+            adapter.updateFullDataList(gameListFull);
+            adapter.notifyItemInserted(0);
+            recyclerView.scrollToPosition(0);
+            adapter.getFilter().filter(currentFilter);
+        } else {
+            Log.d("Firebase", "Game date is null or not after the current date");
+        }
+    }
+    private void handleChildChanged(@NonNull DataSnapshot dataSnapshot) {
+        String gameId = dataSnapshot.getKey();
+        DataSnapshot detailsSnapshot = dataSnapshot.child("details");
+        Game game = detailsSnapshot.getValue(Game.class);
+        DataSnapshot participantsSnapshot = dataSnapshot.child("participants");
+        long participantCount = participantsSnapshot.getChildrenCount();
+
+        if (game != null && gameId != null) {
+            for (int i = 0; i < gameList.size(); i++) {
+                if (gameList.get(i).getGameID().equals(gameId)) {
+                    game.setParticipantCount(participantCount);
+                    gameListFull.set(i, game); // Update gameListFull first
+                    adapter.updateFullDataList(gameListFull); // Update full data list in adapter
+                    adapter.getFilter().filter(currentFilter); // This will update gameList and refresh the RecyclerView
+                    break;
+                }
+            }
+        }
+        else{
+            Log.e("Firebase", "gameId is null in onChildChanged");
+        }
+    }
+
+    private void handleChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+        String gameId = dataSnapshot.getKey();
+        if (gameId == null) {
+            Log.e("Firebase", "gameId is null in onChildRemoved");
+            return;
+        }
+
+        for (int i = 0; i < gameList.size(); i++) {
+            if (gameList.get(i).getGameID().equals(gameId)) {
+                gameList.remove(i);
+                gameListFull.remove(i); // Remove from gameListFull here too
+                adapter.updateData(gameList);
+                adapter.updateFullDataList(gameListFull); // Update full data list in adapter
+                adapter.notifyItemRemoved(i);
+                adapter.getFilter().filter(currentFilter);
+                break;
+            }
+        }
+    }
+
     private RecyclerViewAdapter.OnItemClickListener getOnItemClickListener() {
         return game -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -185,6 +256,11 @@ public class HomeFragment extends Fragment {
         };
     }
 
+    private void updateGamesCount(int count) {
+        TextView gamesCountTextView = getView().findViewById(R.id.games_count_text_view);
+        gamesCountTextView.setText(String.format(Locale.US, "Upcoming Games: %d", count));
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -198,5 +274,8 @@ public class HomeFragment extends Fragment {
     }
 
 
-
+    @Override
+    public void onDataChanged(int size) {
+        updateGamesCount(size);
+    }
 }

@@ -12,7 +12,6 @@
 <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:id="@+id/drag_handle"
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
         android:layout_height="wrap_content"/>
 
     <LinearLayout
@@ -25,6 +24,7 @@
         android:paddingBottom="5dp">
 
         <TextView
+            android:id="@+id/gameStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -381,11 +381,19 @@
 
         </LinearLayout>
     </LinearLayout>
-    <ProgressBar
+<!--    <ProgressBar-->
+<!--        android:id="@+id/loading_indicator"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:visibility="gone"-->
+<!--        style="?android:attr/progressBarStyleLarge"/>-->
+
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/loading_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"/>
+        android:indeterminate="false" />
+
 </FrameLayout>

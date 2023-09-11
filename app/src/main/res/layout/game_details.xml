@@ -39,7 +39,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/ic_date" />
 
             <TextView
                 android:layout_width="0dp"
@@ -71,7 +71,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/ic_time" />
 
             <TextView
                 android:layout_width="0dp"
@@ -104,7 +104,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/player" />
 
             <TextView
                 android:layout_width="0dp"
@@ -137,7 +137,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/baseline_level" />
 
             <TextView
                 android:layout_width="0dp"
@@ -171,7 +171,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/baseline_location" />
 
             <TextView
                 android:layout_width="0dp"
@@ -205,7 +205,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_namecard" />
+                android:src="@drawable/baseline_person_24" />
 
             <TextView
                 android:layout_width="0dp"
