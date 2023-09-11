@@ -27,9 +27,9 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
-    String name;
+    private String name;
     private Game game;
-    TextView playerTextView;
+    private TextView playerTextView;
 
     public GameDetailBottomSheet(Game game){
         this.game = game;
@@ -42,7 +42,12 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.game_details, container, false);
+        initializeViews(view);
+        setUpUserParticipationListener(view);
+        return view;
+    }
 
+    private void initializeViews(View view) {
         // Set the game data to your views
         TextView dateTextView = view.findViewById(R.id.game_date_detail_text);
         TextView timeTextView = view.findViewById(R.id.game_time_detail_text);
@@ -50,107 +55,95 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         TextView levelTextView = view.findViewById(R.id.game_detail_level);
         TextView locationTextView = view.findViewById(R.id.game_detail_location);
         TextView hostTextView = view.findViewById(R.id.game_detail_host);
-        Button joinGame = view.findViewById(R.id.join_gameBtn);
 
-        DatabaseReference databaseRef;
-        databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(game.getHost());
-        FirebaseDatabase databaseRef2 = FirebaseDatabase.getInstance();
-        DatabaseReference gamesRef = databaseRef2.getReference("games");
-        FirebaseAuth database = FirebaseAuth.getInstance();
-        FirebaseUser user = database.getCurrentUser();;
-        DatabaseReference userParticipationRef = gamesRef.child(game.getGameID()).child("participants").child(user.getUid());
-
-        gamesRef.child(game.getGameID()).child("details").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Game details = snapshot.getValue(Game.class);
-                if (details != null) {
-                    String hostID = details.getHost();
-
-                    userParticipationRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                if (isAdded()) {
-                                    joinGame.setText("Leave Game");
-                                    joinGame.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red));
-                                }
-                                joinGame.setOnClickListener(view -> {
-                                    // Add code to leave the game here
-                                    gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).removeValue().addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(getContext(), "You have left the game", Toast.LENGTH_SHORT).show();
-                                            updateParticipantCount(false); // Update participant count
-                                            dismiss();
-                                        } else {
-                                            Toast.makeText(getContext(), "Failed to leave the game", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                });
-                            } else {
-                                // ...
-                                joinGame.setOnClickListener(view -> {
-                                    if (isAdded()) {
-                                        joinGame.setText("Join Game");
-                                        joinGame.setBackgroundColor(getResources().getColor(R.color.light_blue));
-                                    }
-                                    gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).setValue(true).addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            if (isAdded()) {
-                                                Toast.makeText(getContext(), "You have joined the game", Toast.LENGTH_SHORT).show();
-                                                updateParticipantCount(true); // Update participant count
-                                                dismiss();
-                                            }
-                                        } else {
-                                            if (isAdded()) {
-                                                Toast.makeText(getContext(), "Failed to join the game", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle potential errors
-            }
-        });
-
-
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    // Retrieve the user's data
-                    String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
-                    name = dataSnapshot.child("name").getValue(String.class);
-                    hostTextView.setText(name);
-                    playerTextView.setText(par);
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-
-        });
         dateTextView.setText(game.getDate());
         timeTextView.setText(game.getTime());
         levelTextView.setText(game.getLevel());
         locationTextView.setText(game.getLocation());
-        return view;
+
+        // Set host name and participants
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(game.getHost());
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    name = dataSnapshot.child("name").getValue(String.class);
+                    hostTextView.setText(name);
+                    updatePlayerTextView();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
+    private void setUpUserParticipationListener(View view) {
+        Button joinGame = view.findViewById(R.id.join_gameBtn);
+
+        FirebaseAuth database = FirebaseAuth.getInstance();
+        FirebaseUser user = database.getCurrentUser();
+        DatabaseReference gamesRef = FirebaseDatabase.getInstance().getReference("games");
+        DatabaseReference userParticipationRef = gamesRef.child(game.getGameID()).child("participants").child(user.getUid());
+
+        userParticipationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (isAdded()) {
+                    if (dataSnapshot.exists()) {
+                        setUpLeaveGameButton(joinGame, gamesRef, user);
+                    } else {
+                        setUpJoinGameButton(joinGame, gamesRef, user);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void setUpLeaveGameButton(Button joinGame, DatabaseReference gamesRef, FirebaseUser user) {
+        joinGame.setText("Leave Game");
+        joinGame.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red));
+        joinGame.setOnClickListener(view -> {
+            gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "You have left the game", Toast.LENGTH_SHORT).show();
+                    updateParticipantCount(false);
+                    dismiss();
+                } else {
+                    Toast.makeText(getContext(), "Failed to leave the game", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    private void setUpJoinGameButton(Button joinGame, DatabaseReference gamesRef, FirebaseUser user) {
+        joinGame.setText("Join Game");
+        joinGame.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_blue));
+        joinGame.setOnClickListener(view -> {
+            if (game.getParticipantCount() < Long.parseLong(game.getNumOfPlayer())) {
+                gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).setValue(true).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "You have joined the game", Toast.LENGTH_SHORT).show();
+                        updateParticipantCount(true);
+                        dismiss();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to join the game", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                if(isAdded()){
+                    joinGame.setText("Game is Full");
+                    Toast.makeText(getContext(), "Game is full, you cannot join", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+
     private void updateParticipantCount(boolean isJoining) {
         DatabaseReference gameRef = FirebaseDatabase.getInstance().getReference("games").child(game.getGameID()).child("details");
 
@@ -173,15 +166,17 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
 
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-                if (error != null) {
-                    Toast.makeText(getContext(), "Failed to update participant count", Toast.LENGTH_SHORT).show();
+                if (committed) {
+                    updatePlayerTextView();
                 } else {
-                    // Update the UI to reflect the new participant count
-                    String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
-                    playerTextView.setText(par);
+                    Toast.makeText(getContext(), "Failed to update participant count", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
+    private void updatePlayerTextView() {
+        String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
+        playerTextView.setText(par);
+    }
 }
