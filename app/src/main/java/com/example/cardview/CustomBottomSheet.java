@@ -36,10 +36,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class CustomBottomSheet extends BottomSheetDialogFragment {
     private static final String SUCCESS_MESSAGE = "Successfully created the game";
@@ -205,6 +209,7 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
             return calendar;
         } catch (Exception e) {
             return Calendar.getInstance(); // return current date in case of any exception
+
         }
     }
 
@@ -252,6 +257,7 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     }
     private void handleTimePickerClick(View view) {
         int hour, minute;
+        final Calendar calendar = Calendar.getInstance();
         if (existingGame != null) {
             // Editing a game, get the stored time
             int[] timeParts = parseTime(existingGame.getTime());
@@ -259,7 +265,6 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
             minute = timeParts[1];
         } else {
             // Creating a new game, get the current time
-            final Calendar calendar = Calendar.getInstance();
             hour = calendar.get(Calendar.HOUR_OF_DAY); // 24-hour format
             minute = calendar.get(Calendar.MINUTE);
         }
@@ -271,15 +276,39 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
                 .setTitleText(R.string.select_time)
                 .setInputMode(INPUT_MODE_KEYBOARD)
                 .build();
+
         timepicker.show(getParentFragmentManager(), "timepicker");
         timepicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int selectedHour = timepicker.getHour(); // 24-hour format
                 int selectedMinute = timepicker.getMinute();
+
+                // Get the selected date from the date picker
+                String selectedDateString = dateTv.getText().toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+                try {
+                    Date selectedDate = sdf.parse(selectedDateString);
+                    if (selectedDate != null) {
+                        Calendar selectedCalendar = Calendar.getInstance();
+                        selectedCalendar.setTime(selectedDate);
+                        selectedCalendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                        selectedCalendar.set(Calendar.MINUTE, selectedMinute);
+
+                        // Check if the selected date and time is before the current date and time
+                        if (selectedCalendar.getTime().before(calendar.getTime())) {
+                            // Show a message to the user and don't proceed
+                            Toast.makeText(getContext(), "You cannot select a past time", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
                 String format;
                 if (selectedHour == 0) {
-                    selectedHour = 12; // 12:00 AM
+                    selectedHour += 12; // 12:00 AM
                     format = "AM";
                 } else if (selectedHour == 12) {
                     format = "PM";
@@ -289,6 +318,7 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
                 } else {
                     format = "AM";
                 }
+
                 String formattedTime = String.format(Locale.US, "%02d:%02d %s", selectedHour, selectedMinute, format);
                 timeTv.setText(formattedTime);
             }
