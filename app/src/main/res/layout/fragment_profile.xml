@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/AppBackgroundColor"
+    android:id="@+id/profileFrameLayout"
     tools:context=".ProfileFragment">
 
     <LinearLayout
@@ -313,7 +314,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ZIP Codes"
+                    android:text="Address"
                     android:textSize="16sp"
                     android:paddingStart="8dp"
                     android:textColor="#b6b6b6"/>
@@ -326,13 +327,11 @@
 
                 <TextView
                     android:id="@+id/locationTextView"
-                    android:layout_width="wrap_content"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:maxEms="5"
                     android:textSize="16sp"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="30dp"
+                    android:layout_marginEnd="10dp"
                     android:textColor="@color/light_black"/>
 
                 <ImageView

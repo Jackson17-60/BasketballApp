@@ -3,6 +3,7 @@ package com.example.cardview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,6 +58,11 @@ public class ProfileFragment extends Fragment {
     Activity activity;
     private DatabaseReference userDatabaseRef;
     private ValueEventListener databaseRefListener;
+    private ActivityResultLauncher<String> launcher;
+    public ProfileFragment() {
+    }
+
+
     public ProfileFragment(String name , String gender, String height, String level , String location ,String profileImg) {
         this.name = name;
         this.gender = gender;
@@ -63,6 +70,13 @@ public class ProfileFragment extends Fragment {
         this.level = level;
         this.location = location;
         this.profileImg = profileImg;
+    }
+    public static ProfileFragment newInstance(String selectedLocation) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putString("selected_location", selectedLocation);
+        fragment.setArguments(args);
+        return fragment;
     }
     @Override
     public void onAttach(@NonNull Context context) {
@@ -94,6 +108,37 @@ public class ProfileFragment extends Fragment {
         if(user != null) {
             databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
         }
+
+
+        launcher = registerForActivityResult(new ActivityResultContract<String, String>() {
+            @NonNull
+            @Override
+            public Intent createIntent(@NonNull Context context, String input) {
+                // Create an intent for an ACTIVITY, not a fragment
+                Intent intent = new Intent(context, MapsActivity.class);
+                intent.putExtra("selected_location", input);
+                return intent;
+            }
+
+            @Override
+            public String parseResult(int resultCode, @Nullable Intent intent) {
+                if (intent == null || resultCode != Activity.RESULT_OK) {
+                    return null;
+                }
+                return intent.getStringExtra("selected_location");
+            }
+        }, result -> {
+            if (result != null) {
+                Log.d("res","res" + result);
+                    db.child("users").child(user.getUid()).child("location").setValue(result)
+                            .addOnSuccessListener(aVoid ->
+                                    Toast.makeText(requireContext(), getString(R.string.location_updated), Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(requireContext(), getString(R.string.location_update_failed), Toast.LENGTH_SHORT).show());
+                locationTv.setText(result);
+            }
+        });
+
+
 
 
         pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
@@ -368,35 +413,7 @@ public class ProfileFragment extends Fragment {
         return "Beginner";  // Default value
     }
 
-    private void showLocationDialog() {
-        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.location_layout, null);
-        EditText locationET = dialogView.findViewById(R.id.locationET);
 
-        if (location != null) {
-            locationET.setHint(location);
-        }
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
-                .setView(dialogView)
-                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
-                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
-                    String newLoc = locationET.getText().toString();
-                    if (!newLoc.isEmpty()) {
-                        db.child("users").child(user.getUid()).child("location").setValue(newLoc)
-                                .addOnSuccessListener(aVoid ->
-                                        Toast.makeText(requireContext(), getString(R.string.location_updated), Toast.LENGTH_SHORT).show())
-                                .addOnFailureListener(e -> Toast.makeText(requireContext(), getString(R.string.location_update_failed), Toast.LENGTH_SHORT).show());
-                    } else {
-                            Toast.makeText(requireContext(), getString(R.string.location_empty_error), Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        }
-        dialog.show();
-    }
     private void setupClickListeners(View view) {
         imageViewProfilePicture.setOnClickListener(v ->
                 pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
@@ -408,7 +425,9 @@ public class ProfileFragment extends Fragment {
         genderLayout.setOnClickListener(v -> showGenderDialog());
         heightLayout.setOnClickListener(v -> showHeightDialog());
         levelLayout.setOnClickListener(v -> showLevelDialog());
-        locationLayout.setOnClickListener(v -> showLocationDialog());
+//        locationLayout.setOnClickListener(v -> showLocationDialog());
+
+        locationLayout.setOnClickListener(v -> launcher.launch(location));
     }
 
     public void setProfileData(String gender, String height, String level, String location, String name, String profileImg) {
@@ -455,5 +474,6 @@ public class ProfileFragment extends Fragment {
         heightLayout.setOnClickListener(null);
         levelLayout.setOnClickListener(null);
         locationLayout.setOnClickListener(null);
+        launcher.unregister();
     }
 }
