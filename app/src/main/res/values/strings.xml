@@ -39,5 +39,8 @@
     <string name="location_label">Location</string>
     <string name="players_needed_label">Players Needed</string>
     <string name="level_label">Level</string>
+    <string name="title_activity_maps">MapsActivity</string>
 
+
+    <string name="api_key">AIzaSyBZVfsU9RWTh04vxBS5gHX5XQd2jvBSQtY</string>
 </resources>

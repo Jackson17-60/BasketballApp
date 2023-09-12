@@ -26,7 +26,7 @@
                 android:layout_marginTop="16dp"
                 app:tint="@color/white"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/baseline_arrow_back_ios_24" />
+                android:src="@drawable/baseline_arrow_back_24" />
 
             <ImageView
                 android:id="@+id/signUp_bkbLogo"

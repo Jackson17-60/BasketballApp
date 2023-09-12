@@ -105,7 +105,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
         fab.setOnClickListener(view1 -> {
             FragmentActivity activity = getActivity();
             if (activity != null) {
-                CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout, null);
+                CustomBottomSheet bottomSheet = new CustomBottomSheet(null);
                 bottomSheet.show(activity.getSupportFragmentManager(), "CustomBottomSheet");
             } else {
                 Log.e("HomeFragment", "Activity is null");
@@ -243,7 +243,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
 
                 if (currentUserId.equals(game.getHost())) {
                     // Current user is the host
-                    CustomBottomSheet bottomSheet = new CustomBottomSheet(R.layout.add_games_layout, game);
+                    CustomBottomSheet bottomSheet = new CustomBottomSheet(game);
                     bottomSheet.show(activity.getSupportFragmentManager(), bottomSheet.getTag());
                 } else {
                     // Current user is not the host

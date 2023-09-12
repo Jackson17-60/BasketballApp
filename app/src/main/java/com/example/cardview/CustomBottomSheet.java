@@ -2,7 +2,10 @@ package com.example.cardview;
 
 import static com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_KEYBOARD;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,9 +19,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,22 +58,24 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     private static final String SUCCESS_MESSAGE = "Successfully created the game";
     private static final String FAILURE_MESSAGE = "Failed to create the new game";
     private int layoutResId;
-    private String selectedLevel, addDate, addTime, addGameLoc, addPlayers;
+    private String selectedLevel, addDate, addTime, addGameLoc, addPlayers,selectedLocation;
     private RadioGroup levelRadioGroup;
     private Button addGameBtn,deleteGameBtn;
-    private TextView dateTv, timeTv,gameStatus;
-    private EditText gameLocationET, playersNeededET;
+    private TextView dateTv, timeTv,gameStatus,gameLocationTv;
+    private EditText playersNeededET;
     private DatabaseReference gamesReference;
     private FirebaseUser user;
-
     private FirebaseAuth auth;
+    private ActivityResultLauncher<String> launcher;
 
     private ProgressBar loadingIndicator;
     private FirebaseDatabase database;
     private Game existingGame;
+    public CustomBottomSheet() {
 
-    public CustomBottomSheet(int layoutResId, @Nullable Game existingGame) {
-        this.layoutResId = layoutResId;
+    }
+    public CustomBottomSheet(@Nullable Game existingGame) {
+
         this.existingGame = existingGame;
     }
 
@@ -75,11 +86,31 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         user = auth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
         gamesReference = database.getReference().child("games");
+        launcher = registerForActivityResult(new ActivityResultContract<String, String>() {   @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, String input) {
+            Intent intent = new Intent(context, MapsActivity.class);
+            intent.putExtra("selected_location", input);
+            return intent;
+        }
+            @Override
+            public String parseResult(int resultCode, @Nullable Intent intent) {
+                if (intent == null || resultCode != Activity.RESULT_OK) {
+                    return null; // or you might want to throw an exception
+                }
+                return intent.getStringExtra("selected_location");
+            }
+        }, result -> {
+            if (result != null) {
+                gameLocationTv.setText(result);
+                selectedLocation = result;
+            }
+        });
     }
     private void initializeViews(View rootView) {
         levelRadioGroup = rootView.findViewById(R.id.gamelevelRadioGroup);
         playersNeededET = rootView.findViewById(R.id.playersNeededET);
-        gameLocationET = rootView.findViewById(R.id.gameLocationET);
+        gameLocationTv = rootView.findViewById(R.id.gameLocationTextView);
         dateTv = rootView.findViewById(R.id.gameDateText);
         timeTv = rootView.findViewById(R.id.gameTimeText);
         addGameBtn = rootView.findViewById(R.id.addgame_btn);
@@ -100,30 +131,29 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     private void setupClickListeners(View rootView) {
         LinearLayout datePickerLayout = rootView.findViewById(R.id.datePickerLayout);
         LinearLayout timePickerLayout = rootView.findViewById(R.id.timePickerLayout);
+        LinearLayout gameLocationLayout = rootView.findViewById(R.id.gamesLocationLayout);
         datePickerLayout.setOnClickListener(this::handleDatePickerClick);
         timePickerLayout.setOnClickListener(this::handleTimePickerClick);
+        gameLocationLayout.setOnClickListener(v -> launcher.launch(selectedLocation));
         addGameBtn.setOnClickListener(this::handleAddGameClick);
         deleteGameBtn.setOnClickListener(this::handleDeleteGameClick);
     }
     private void setupLevelRadioGroupListener() {
-        levelRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.game_beginner_radiobtn) {
-                    selectedLevel = "Beginner";
-                } else if (checkedId == R.id.game_ama_radiobtn) {
-                    selectedLevel = "Amateur";
-                }
-                else if(checkedId == R.id.game_pro_radiobtn) {
-                    selectedLevel = "Professional";
-                }
+        levelRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.game_beginner_radiobtn) {
+                selectedLevel = "Beginner";
+            } else if (checkedId == R.id.game_ama_radiobtn) {
+                selectedLevel = "Amateur";
+            }
+            else if(checkedId == R.id.game_pro_radiobtn) {
+                selectedLevel = "Professional";
             }
         });
     }
     private void addNewGameToDatabase() {
         addDate = dateTv.getText().toString().trim();
         addTime = timeTv.getText().toString().trim();
-        addGameLoc = gameLocationET.getText().toString().trim();
+        addGameLoc = gameLocationTv.getText().toString().trim();
         addPlayers = playersNeededET.getText().toString().trim();
         int selectedRadioButtonId = levelRadioGroup.getCheckedRadioButtonId();
 
@@ -170,10 +200,11 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
             Toast.makeText(requireContext(), "Please Fill In All The Fields", Toast.LENGTH_SHORT).show();
         }
     }
+
     private boolean validateInput() {
         addDate = dateTv.getText().toString().trim();
         addTime = timeTv.getText().toString().trim();
-        addGameLoc = gameLocationET.getText().toString().trim();
+        addGameLoc = gameLocationTv.getText().toString().trim();
         addPlayers = playersNeededET.getText().toString().trim();
         int selectedRadioButtonId = levelRadioGroup.getCheckedRadioButtonId();
         return !addDate.isEmpty() && !addTime.isEmpty() && !addGameLoc.isEmpty() && !addPlayers.isEmpty() && selectedRadioButtonId != -1;
@@ -328,10 +359,12 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(layoutResId, container, false);
+        View rootView = inflater.inflate(R.layout.add_games_layout, container, false);
         initializeViews(rootView);
         setupClickListeners(rootView);
         setupLevelRadioGroupListener();
+
+
         if (existingGame != null) {
             gameStatus.setText(R.string.edit_game);
             deleteGameBtn.setVisibility(View.VISIBLE);
@@ -343,7 +376,8 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
 
         dateTv.setText(game.getDate());
         timeTv.setText(game.getTime());
-        gameLocationET.setText(game.getLocation());
+        gameLocationTv.setText(game.getLocation());
+        selectedLocation = game.getLocation();
         playersNeededET.setText(game.getNumOfPlayer() != null ? String.valueOf(game.getNumOfPlayer()) : "");
 
 
@@ -406,6 +440,12 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         super.onDestroy();
     }
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+
+    @Override
     public void onStart() {
         super.onStart();
         View view = getView();
@@ -415,5 +455,6 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
+
 
 }
