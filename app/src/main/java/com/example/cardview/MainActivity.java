@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference databaseRef;
     FirebaseAuth database ;
-    FirebaseFirestore firestore;
     String height,gender, location, level, name,profileImg;
     ProfileFragment profileFragment;
     @Override
@@ -45,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             replaceFragment(new HomeFragment());
 
         }
+
 
         database = FirebaseAuth.getInstance();
         user = database.getCurrentUser();

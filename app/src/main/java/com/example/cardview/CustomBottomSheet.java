@@ -24,26 +24,20 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,7 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
+
 
 public class CustomBottomSheet extends BottomSheetDialogFragment {
     private static final String SUCCESS_MESSAGE = "Successfully created the game";
@@ -436,8 +430,61 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         super.onDestroy();
+        launcher.unregister();
+        auth =null;
+        user = null;
+        gamesReference = null;
+        database = null;
+
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        View view = getView();
+        if (view != null) {
+            LinearLayout datePickerLayout = view.findViewById(R.id.datePickerLayout);
+            LinearLayout timePickerLayout = view.findViewById(R.id.timePickerLayout);
+            LinearLayout gameLocationLayout = view.findViewById(R.id.gamesLocationLayout);
+
+            if (datePickerLayout != null) {
+                datePickerLayout.setOnClickListener(null);
+            }
+
+            if (timePickerLayout != null) {
+                timePickerLayout.setOnClickListener(null);
+            }
+
+            if (gameLocationLayout != null) {
+                gameLocationLayout.setOnClickListener(null);
+            }
+        }
+
+        if (levelRadioGroup != null) {
+            levelRadioGroup.setOnCheckedChangeListener(null);
+            levelRadioGroup = null;
+        }
+
+        if (addGameBtn != null) {
+            addGameBtn.setOnClickListener(null);
+            addGameBtn = null;
+        }
+
+        if (deleteGameBtn != null) {
+            deleteGameBtn.setOnClickListener(null);
+            deleteGameBtn = null;
+        }
+
+        playersNeededET = null;
+        gameLocationTv = null;
+        dateTv = null;
+        timeTv = null;
+        gameStatus = null;
+        loadingIndicator = null;
     }
     @Override
     public void onPause() {

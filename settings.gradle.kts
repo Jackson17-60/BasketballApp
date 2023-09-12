@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CardView"
 include(":app")
+include(":app:benchmark")

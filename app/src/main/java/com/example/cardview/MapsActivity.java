@@ -56,19 +56,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        } else {
+            Log.e(TAG, "Error - Map Fragment was null");
+        }
 
         searchView = findViewById(R.id.searchView);
 
-        if (geocoder == null) {
-            geocoder = new Geocoder(this, Locale.getDefault());
-        }
-        Button confirmButton = findViewById(R.id.button_confirm);
-        text_selected_location = findViewById(R.id.text_selected_location);
-        confirmButton.setOnClickListener(v -> confirmSelection());
+        geocoder = new Geocoder(this, Locale.getDefault());
 
-        ImageView closeButton = findViewById(R.id.button_close);
-        closeButton.setOnClickListener(v -> finish());
+        setupButtons();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Intent intent = getIntent();
         String selectedLocation = intent.getStringExtra("selected_location");
@@ -79,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         setupMapListeners();
         setupSearchView();
@@ -90,10 +88,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         void onGeocodeResult(@Nullable LatLng latLng, @Nullable String addressText);
     }
 
+    private void setupButtons() {
+        Button confirmButton = findViewById(R.id.button_confirm);
+        text_selected_location = findViewById(R.id.text_selected_location);
+        confirmButton.setOnClickListener(v -> confirmSelection());
+
+        ImageView closeButton = findViewById(R.id.button_close);
+        closeButton.setOnClickListener(v -> finish());
+    }
 
     @Override
     public boolean onMyLocationButtonClick() {
         updateLocation();
+        Log.d("fuck","test");
         return false;
     }
     private void setupMapListeners() {
@@ -116,10 +123,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
+        enableMyLocation();
+    }
+    private void enableMyLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        mMap.setMyLocationEnabled(true);
     }
 
 
@@ -138,7 +149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                         updateMarker(latLng, "Your location");
 
-
                         geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1, new Geocoder.GeocodeListener() {
                             @Override
                             public void onGeocode(@NonNull List<Address> addresses) {
@@ -153,12 +163,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             public void onError(@Nullable String errorMessage) {
                                 runOnUiThread(() -> Toast.makeText(MapsActivity.this, "Geocode error", Toast.LENGTH_SHORT).show());
                             }
-
                         });
-                        geocodeLocation(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), this::updateMarker);
                     }
                 });
     }
+
 
 
     private void performSearch(String query) {
@@ -166,7 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (latLng != null && addressText != null) {
                 updateMarker(latLng, addressText);
             } else {
-                runOnUiThread(() -> Toast.makeText(MapsActivity.this, "No location found for the query", Toast.LENGTH_SHORT).show());
+                Toast.makeText(MapsActivity.this, "No location found for the query", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -263,5 +272,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(this, "No location selected", Toast.LENGTH_SHORT).show();
         }
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        if (mMap != null) {
+            mMap.setOnMapClickListener(null);
+            mMap.setOnMapLongClickListener(null);
+            mMap.setOnMyLocationButtonClickListener(null);
+        }
+    }
 }
