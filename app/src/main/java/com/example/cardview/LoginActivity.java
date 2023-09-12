@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText emailEditText;
     private EditText passwordEditText;
     private TextView signUp;
     private ImageView showpassword,bkbLogo;
@@ -45,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         bkbLogo = findViewById(R.id.bkb_logo);
         signUp = findViewById(R.id.sign_up);
-         emailEditText = findViewById(R.id.login_email);
          passwordEditText = findViewById(R.id.login_pass);
          btnLogin = findViewById(R.id.btn_login);
         showpassword = findViewById(R.id.show_password);
@@ -99,14 +97,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(intent);
-                finish();
+        signUp.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+            startActivity(intent);
+            finish();
 
-            }
         });
 
     }

@@ -29,7 +29,10 @@ import com.google.firebase.database.ValueEventListener;
 public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
     private String name;
     private Game game;
-    private TextView playerTextView;
+    private TextView playerTextView, dateTextView, timeTextView, levelTextView, locationTextView, hostTextView;
+    private Button joinGame;
+    private ValueEventListener userParticipationListener;
+    private DatabaseReference userParticipationRef;
 
     public GameDetailBottomSheet(Game game){
         this.game = game;
@@ -49,12 +52,12 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
 
     private void initializeViews(View view) {
         // Set the game data to your views
-        TextView dateTextView = view.findViewById(R.id.game_date_detail_text);
-        TextView timeTextView = view.findViewById(R.id.game_time_detail_text);
+         dateTextView = view.findViewById(R.id.game_date_detail_text);
+         timeTextView = view.findViewById(R.id.game_time_detail_text);
         playerTextView = view.findViewById(R.id.game_detail_player);
-        TextView levelTextView = view.findViewById(R.id.game_detail_level);
-        TextView locationTextView = view.findViewById(R.id.game_detail_location);
-        TextView hostTextView = view.findViewById(R.id.game_detail_host);
+         levelTextView = view.findViewById(R.id.game_detail_level);
+         locationTextView = view.findViewById(R.id.game_detail_location);
+         hostTextView = view.findViewById(R.id.game_detail_host);
 
         dateTextView.setText(game.getDate());
         timeTextView.setText(game.getTime());
@@ -79,14 +82,14 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         });
     }
     private void setUpUserParticipationListener(View view) {
-        Button joinGame = view.findViewById(R.id.join_gameBtn);
+        joinGame = view.findViewById(R.id.join_gameBtn);
 
         FirebaseAuth database = FirebaseAuth.getInstance();
         FirebaseUser user = database.getCurrentUser();
         DatabaseReference gamesRef = FirebaseDatabase.getInstance().getReference("games");
-        DatabaseReference userParticipationRef = gamesRef.child(game.getGameID()).child("participants").child(user.getUid());
+        userParticipationRef = gamesRef.child(game.getGameID()).child("participants").child(user.getUid());
 
-        userParticipationRef.addValueEventListener(new ValueEventListener() {
+        userParticipationListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (isAdded()) {
@@ -101,7 +104,8 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
+        };
+        userParticipationRef.addValueEventListener(userParticipationListener);
     }
 
     private void setUpLeaveGameButton(Button joinGame, DatabaseReference gamesRef, FirebaseUser user) {
@@ -179,4 +183,28 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
         playerTextView.setText(par);
     }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (getView() != null) {
+            ViewGroup parent = (ViewGroup) getView().getParent();
+            if (parent != null) {
+                parent.removeAllViews();
+            }
+        }
+        if (joinGame != null) {
+            joinGame.setOnClickListener(null);
+            joinGame = null;
+        }
+        playerTextView = null;
+        dateTextView = null;
+        timeTextView = null;
+        levelTextView = null;
+        locationTextView = null;
+        hostTextView = null;
+        if (userParticipationRef != null && userParticipationListener != null) {
+            userParticipationRef.removeEventListener(userParticipationListener);
+        }
+    }
+
 }

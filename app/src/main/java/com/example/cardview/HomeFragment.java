@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
     private List<Game> gameList = new ArrayList<>();
     private List<Game> gameListFull = new ArrayList<>();
     private String currentFilter = null;
-
+    private ChildEventListener childEventListener;
 
     private RecyclerViewAdapter adapter;
     private final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.US);
@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
 
     private void setupFirebaseDatabase() {
         gamesReference = FirebaseDatabase.getInstance().getReference().child("games");
-        gamesReference.addChildEventListener(new ChildEventListener() {
+        childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 handleChildAdded(dataSnapshot);
@@ -157,7 +157,8 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("Firebase", "Error retrieving data", databaseError.toException());
             }
-        });
+        };
+        gamesReference.addChildEventListener(childEventListener);
     }
     private void handleChildAdded(DataSnapshot dataSnapshot) {
         DataSnapshot detailsSnapshot = dataSnapshot.child("details");
@@ -260,7 +261,14 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
         TextView gamesCountTextView = getView().findViewById(R.id.games_count_text_view);
         gamesCountTextView.setText(String.format(Locale.US, "Upcoming Games: %d", count));
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (gamesReference != null && childEventListener != null) {
+            gamesReference.removeEventListener(childEventListener);
+        }
+        handler.removeCallbacks(runnable); // Ensure to remove any lingering callbacks
+    }
     @Override
     public void onResume() {
         super.onResume();

@@ -55,6 +55,7 @@ public class ProfileFragment extends Fragment {
     String height,gender, location, level, name,profileImg;
     Activity activity;
     private DatabaseReference userDatabaseRef;
+    private ValueEventListener databaseRefListener;
     public ProfileFragment(String name , String gender, String height, String level , String location ,String profileImg) {
         this.name = name;
         this.gender = gender;
@@ -152,7 +153,7 @@ public class ProfileFragment extends Fragment {
 
         setProfileData(name, gender, height, level, location, profileImg);
         // Fetch and set profile data from Firebase
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        databaseRefListener = new ValueEventListener() {
             @Override
 
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -189,7 +190,8 @@ public class ProfileFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle any errors here
             }
-        });
+        };
+        databaseRef.addValueEventListener(databaseRefListener);
 
 
         imageViewProfilePicture.setOnClickListener(view1 ->
@@ -436,4 +438,22 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (databaseRefListener != null && databaseRef != null) {
+            databaseRef.removeEventListener(databaseRefListener);
+        }
+        locationTv = null;
+        nameTv = null;
+        levelTv = null;
+        heightTv = null;
+        genderTv = null;
+        imageViewProfilePicture = null;
+        nameLayout.setOnClickListener(null);
+        genderLayout.setOnClickListener(null);
+        heightLayout.setOnClickListener(null);
+        levelLayout.setOnClickListener(null);
+        locationLayout.setOnClickListener(null);
+    }
 }
