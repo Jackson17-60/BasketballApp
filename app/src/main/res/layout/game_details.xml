@@ -26,13 +26,44 @@
             android:text="Game Detail"
             android:textColor="@color/light_black"
             android:textSize="18sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:padding="12dp">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/baseline_person_24" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Host"
+                android:textColor="#b6b6b6"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/game_detail_host"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/light_black"
+                android:textSize="16sp" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/custom_divider" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="12dp"
-            android:layout_marginTop="20dp">
+            android:padding="12dp">
 
             <ImageView
                 android:layout_width="24dp"
@@ -160,6 +191,7 @@
             android:layout_height="1dp"
             android:background="@drawable/custom_divider" />
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,54 +206,59 @@
                 android:src="@drawable/baseline_location" />
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Location"
+                android:layout_gravity="center_vertical"
                 android:textColor="#b6b6b6"
                 android:textSize="16sp" />
 
+
+            <View
+                android:layout_width="30dp"
+                android:layout_height="match_parent"/>
+
             <TextView
                 android:id="@+id/game_detail_location"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="end"
                 android:textColor="@color/light_black"
                 android:textSize="16sp" />
-        </LinearLayout>
 
+
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/custom_divider" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="12dp">
+            android:layout_height="200dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/baseline_person_24" />
+                android:id="@+id/mapImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Host"
-                android:textColor="#b6b6b6"
-                android:textSize="16sp" />
+            <Button
 
-            <TextView
-                android:id="@+id/game_detail_host"
+                android:id="@+id/open_googlemapBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/light_black"
-                android:textSize="16sp" />
-        </LinearLayout>
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:text="Open in Google Maps"
+                android:textSize="16sp"
+                android:background="@android:color/transparent"
+                android:padding="10dp"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"

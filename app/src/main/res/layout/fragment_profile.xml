@@ -49,6 +49,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:id="@+id/nameLayout"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/ripple_effect"
             android:padding="16dp">
 
             <!-- Left side: First ImageView and TextView -->
@@ -111,6 +114,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:id="@+id/genderLayout"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/ripple_effect"
             android:padding="16dp">
 
             <!-- Left side: First ImageView and TextView -->
@@ -172,6 +178,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:id="@+id/heightLayout"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/ripple_effect"
             android:padding="16dp">
 
             <!-- Left side: First ImageView and TextView -->
@@ -234,6 +243,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/ripple_effect"
             android:padding="16dp">
 
             <!-- Left side: First ImageView and TextView -->
@@ -296,6 +308,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/ripple_effect"
             android:padding="16dp">
 
             <!-- Left side: First ImageView and TextView -->

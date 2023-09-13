@@ -1,11 +1,15 @@
 package com.example.cardview;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,8 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,11 +32,16 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
     private String name;
     private Game game;
     private TextView playerTextView, dateTextView, timeTextView, levelTextView, locationTextView, hostTextView;
-    private Button joinGame;
+
+    ImageView mapPreviewImageView ;
+    private Button joinGame,open_googlemapBtn;
     private ValueEventListener userParticipationListener;
     private DatabaseReference userParticipationRef;
 
@@ -58,6 +69,33 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
          levelTextView = view.findViewById(R.id.game_detail_level);
          locationTextView = view.findViewById(R.id.game_detail_location);
          hostTextView = view.findViewById(R.id.game_detail_host);
+        mapPreviewImageView = view.findViewById(R.id.mapImageView);
+        open_googlemapBtn = view.findViewById(R.id.open_googlemapBtn);
+        String address = game.getLocation();
+        String apiKey = "AIzaSyBZVfsU9RWTh04vxBS5gHX5XQd2jvBSQtY"; // replace with your actual API key
+
+        try {
+            // Encode the address to be used in a URL
+            String encodedAddress = URLEncoder.encode(address, "UTF-8");
+
+            // Create the URL string using the encoded address and API key
+            String urlString = String.format(
+                    "https://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=20&size=500x200&markers=color:blue%%7Clabel:S%%7C%s&key=%s",
+                    encodedAddress,
+                    encodedAddress,
+                    apiKey
+            );
+
+            // Now you have the URL string that you can use to load the image or open in a browser
+            Glide.with(this)
+                    .load(urlString)
+                    .into(mapPreviewImageView);
+
+            open_googlemapBtn.setOnClickListener(view1 -> openInGoogleMaps(urlString));
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         dateTextView.setText(game.getDate());
         timeTextView.setText(game.getTime());
@@ -183,6 +221,19 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
         playerTextView.setText(par);
     }
+    private void openInGoogleMaps(String address) {
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(address));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        Activity activity = getActivity();
+        if (activity != null && mapIntent.resolveActivity(activity.getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }else {
+            if(isAdded()){
+                Toast.makeText(requireContext(), "Google Maps is not installed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -196,7 +247,7 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
             joinGame.setOnClickListener(null);
             joinGame = null;
         }
-        playerTextView = null;
+        open_googlemapBtn.setOnClickListener(null);
         dateTextView = null;
         timeTextView = null;
         levelTextView = null;
@@ -204,6 +255,17 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         hostTextView = null;
         if (userParticipationRef != null && userParticipationListener != null) {
             userParticipationRef.removeEventListener(userParticipationListener);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        View view = getView();
+        if (view != null) {
+            View parent = (View) view.getParent();
+            BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(parent);
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
 
