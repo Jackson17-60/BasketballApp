@@ -45,12 +45,12 @@ public class LoginController implements TextWatcher {
         // Restore cursor position
         passwordEditText.setSelection(cursorPosition);
     }
-    public static boolean isInputValid(String email, String password) {
-        return !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password);
+    public static boolean isInputValid(String name,String email, String password , int  selectedRadioButtonId) {
+        return  !TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)  && selectedRadioButtonId != -1;
     }
 
     public static void showEmptyFieldsToast(Context context) {
-        Toast.makeText(context, "Please enter both email and password.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Please fill in all the field", Toast.LENGTH_SHORT).show();
     }
 
 

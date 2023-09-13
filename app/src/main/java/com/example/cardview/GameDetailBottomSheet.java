@@ -134,7 +134,8 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
                     if (dataSnapshot.exists()) {
                         setUpLeaveGameButton(joinGame, gamesRef, user);
                     } else {
-                        setUpJoinGameButton(joinGame, gamesRef, user);
+                        DatabaseReference  usersRef = FirebaseDatabase.getInstance().getReference("users");
+                        setUpJoinGameButton(joinGame, gamesRef, usersRef,user);
                     }
                 }
             }
@@ -162,29 +163,47 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         });
     }
 
-    private void setUpJoinGameButton(Button joinGame, DatabaseReference gamesRef, FirebaseUser user) {
+    private void setUpJoinGameButton(Button joinGame, DatabaseReference gamesRef, DatabaseReference usersRef, FirebaseUser user) {
         joinGame.setText("Join Game");
         joinGame.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.light_blue));
         joinGame.setOnClickListener(view -> {
-            if (game.getParticipantCount() < Long.parseLong(game.getNumOfPlayer())) {
-                gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).setValue(true).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "You have joined the game", Toast.LENGTH_SHORT).show();
-                        updateParticipantCount(true);
-                        dismiss();
+            usersRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String userLevel = dataSnapshot.child("level").getValue(String.class);
+                    String gameLevel = game.getLevel(); // Assuming 'game' is an object that holds the game's details.
+
+                     if (userLevel != null && userLevel.equals(gameLevel)) {
+                        if (game.getParticipantCount() < Long.parseLong(game.getNumOfPlayer())) {
+                            gamesRef.child(game.getGameID()).child("participants").child(user.getUid()).setValue(true).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(), "You have joined the game", Toast.LENGTH_SHORT).show();
+                                    updateParticipantCount(true);
+                                    dismiss();
+                                } else {
+                                    Toast.makeText(getContext(), "Failed to join the game", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            if (isAdded()) {
+                                joinGame.setText("Game is Full");
+                                Toast.makeText(getContext(), "Game is full, you cannot join", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     } else {
-                        Toast.makeText(getContext(), "Failed to join the game", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "You cannot join this game as your level does not match the game level", Toast.LENGTH_SHORT).show();
                     }
-                });
-            } else {
-                if(isAdded()){
-                    joinGame.setText("Game is Full");
-                    Toast.makeText(getContext(), "Game is full, you cannot join", Toast.LENGTH_SHORT).show();
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle error
+                    Toast.makeText(getContext(), "An error occurred: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
+
 
     private void updateParticipantCount(boolean isJoining) {
         DatabaseReference gameRef = FirebaseDatabase.getInstance().getReference("games").child(game.getGameID()).child("details");

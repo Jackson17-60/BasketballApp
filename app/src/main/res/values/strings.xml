@@ -28,7 +28,7 @@
     <string name="location_updated">Location Updated</string>
     <string name="location_update_failed">Failed to update location. Please try again.</string>
     <string name="location_empty_error">Location cannot be empty.</string>
-    <string name="height_format">%s cm</string>
+    <string name="height_format">%s CM</string>
     <string name="upload_success">Uploaded Successfully.</string>
     <string name="upload_failed">Failed to Upload</string>
 

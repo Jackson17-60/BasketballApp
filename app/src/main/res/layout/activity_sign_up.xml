@@ -40,14 +40,13 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
             android:layout_height="wrap_content">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="26sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal"
                 android:textColor="#28282B"
@@ -57,16 +56,54 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:layout_marginTop="15dp"
-                android:text="Looks like you're new here !">
+                android:layout_gravity="center_vertical"
+                android:text=" ~ Looks like you're new here !">
             </TextView>
 
         </LinearLayout>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="62dp"
-            android:layout_marginTop="36.7dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="62dp"
+            android:background="@drawable/blue_border_rounded_corner">
+
+            <!-- INPUT -->
+            <EditText
+                android:id="@+id/signup_name"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_toEndOf="@+id/nameIcon"
+                android:background="@android:color/transparent"
+                android:hint="Name"
+                android:maxLines="1"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="15dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/nameIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                app:tint="@color/main_blue"
+                android:src="@drawable/baseline_namecard" />
+
+        </RelativeLayout>
+
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="62dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="62dp"
             android:background="@drawable/blue_border_rounded_corner">
 
@@ -103,7 +140,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="62dp"
-            android:layout_marginTop="12.7dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="62dp"
             android:background="@drawable/blue_border_rounded_corner">
 
@@ -147,6 +184,82 @@
                 app:tint="#1566E0" />
 
         </RelativeLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="75dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="75dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                app:tint="@color/main_blue"
+                android:src="@drawable/baseline_level" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:text="Level"
+                android:layout_gravity="center_vertical"
+                android:textColor="@color/lighter_black"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/gamesLevelLayout"
+                style="@style/GameLayoutStyle">
+
+                <RadioGroup
+                    android:id="@+id/signuplevelRadioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/signup_beginner_radiobtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_radiobtn"
+                        android:button="@android:color/transparent"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="Beginner" />
+
+                    <RadioButton
+                        android:id="@+id/signup_ama_radiobtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_radiobtn"
+                        android:button="@android:color/transparent"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="Amateur" />
+
+                    <RadioButton
+                        android:id="@+id/signup_pro_radiobtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_radiobtn"
+                        android:button="@android:color/transparent"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="Professional" />
+
+                </RadioGroup>
+
+            </RelativeLayout>
 
 
         <Button
@@ -155,7 +268,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="62dp"
-            android:layout_marginTop="18.7dp"
             android:layout_marginRight="62dp"
             android:background="@drawable/blue_fill_rounded_color"
             android:gravity="center"
