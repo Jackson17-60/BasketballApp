@@ -1,27 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gameLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="14dp"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-
+    android:layout_height="wrap_content">
 
 <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-        android:id="@+id/drag_handle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="14dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:paddingBottom="5dp">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/gameStatus"
@@ -310,7 +303,7 @@
                 <!-- Right side: Second TextView and ImageView -->
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_marginTop="5dp">
 
                     <RadioGroup
@@ -326,8 +319,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="15dp"
-                            android:paddingEnd="15dp"
+                            android:padding="15dp"
                             android:text="Beginner" />
 
                         <RadioButton
@@ -336,8 +328,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="15dp"
-                            android:paddingEnd="15dp"
+                            android:padding="15dp"
                             android:text="Amateur" />
 
                         <RadioButton
@@ -346,8 +337,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/custom_radiobtn"
                             android:button="@android:color/transparent"
-                            android:paddingStart="15dp"
-                            android:paddingEnd="15dp"
+                            android:padding="15dp"
                             android:text="Professional" />
 
                     </RadioGroup>
@@ -359,20 +349,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/light_blue"
                     android:text="CONFIRM"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
                     android:textColor="#ffffff"
                     android:textSize="16sp" />
                 <Button
                     android:id="@+id/delete_game_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Delete Game"
+                    android:text="Delete"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
                     android:textColor="#ffffff"
                     android:backgroundTint="@color/red"
                     android:textSize="16sp"
                     android:visibility="gone"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
 
 
             </LinearLayout>

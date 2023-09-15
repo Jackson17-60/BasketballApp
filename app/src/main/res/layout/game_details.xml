@@ -3,11 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:id="@+id/gameLayout">
 
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-        android:id="@+id/drag_handle"
         android:layout_width="match_parent"
         android:layout_marginTop="5dp"
         android:layout_height="wrap_content" />
@@ -16,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:fontFamily="@font/inter_font"
         android:padding="16dp">
 
         <TextView
@@ -270,9 +267,10 @@
             android:id="@+id/join_gameBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/light_blue"
             android:text="Join"
-            android:layout_marginTop="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_marginTop="10dp"
             android:textColor="#ffffff"
             android:textSize="16sp" />
 
