@@ -10,13 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cardview.R;
-import com.example.cardview.databinding.UpcomingGamesLayoutBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.example.cardview.Model_Class.Game;
+import com.example.cardview.databinding.GamesLayoutBinding;
 
 public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerViewAdapter.ViewHolder> implements Filterable {
     private List<Game> gameList;
@@ -45,7 +45,7 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        UpcomingGamesLayoutBinding binding = UpcomingGamesLayoutBinding.inflate(inflater, parent, false);
+        GamesLayoutBinding binding = GamesLayoutBinding.inflate(inflater, parent, false);
         return new ViewHolder(binding, onItemClickListener);
     }
 
@@ -70,9 +70,9 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        UpcomingGamesLayoutBinding binding;
+        GamesLayoutBinding binding;
 
-        public ViewHolder(@NonNull UpcomingGamesLayoutBinding binding, final OnItemClickListener listener) {
+        public ViewHolder(@NonNull GamesLayoutBinding binding, final OnItemClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
 
