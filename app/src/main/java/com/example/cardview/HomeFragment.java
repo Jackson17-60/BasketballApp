@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -99,23 +101,23 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
     }
 
 
-    private void setupLevelFilterSpinner(View view) {
-        Spinner levelFilterSpinner = view.findViewById(R.id.levelFilterSpinner);
-        levelFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                currentFilter = (String) parent.getItemAtPosition(position);
-                if ("All Levels".equals(currentFilter)) {
-                    currentFilter = null;
-                }
-                adapter.getFilter().filter(currentFilter);
-            }
+private void setupLevelFilterSpinner(View view) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
+    String[] levelArray = getResources().getStringArray(R.array.level_array);
+    ArrayAdapter<String> spinnerAdapter= new ArrayAdapter<>(requireContext(), R.layout.spinner_dropdown_item, levelArray);
+    AutoCompleteTextView spinner = view.findViewById(R.id.levelFilterSpinner);
+    spinner.setAdapter(spinnerAdapter);
+    spinner.setText(spinnerAdapter.getItem(0), false);
+    spinner.setOnItemClickListener((parent, view1, position, id) -> {
+        currentFilter = (String) parent.getItemAtPosition(position);
+        if ("All Levels".equals(currentFilter)) {
+            currentFilter = null;
+        }
+
+        adapter.getFilter().filter(currentFilter);
+    });
+}
+
 
     private void setupFirebaseDatabase() {
         gamesReference = FirebaseDatabase.getInstance().getReference().child("games");

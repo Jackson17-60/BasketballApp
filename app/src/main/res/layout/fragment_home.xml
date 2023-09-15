@@ -24,17 +24,23 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-                <Spinner
-                    android:id="@+id/levelFilterSpinner"
-                    android:layout_width="match_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="370dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginBottom="12dp"
-                    android:background="@drawable/spinner_background"
-                    android:elevation="8dp"
-                    android:entries="@array/level_array"
-                    android:paddingBottom="16dp"
-                    android:paddingTop="16dp" />
+                    android:hint="Level"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/levelFilterSpinner"
+                        android:inputType="none">
+
+                    </AutoCompleteTextView>
+                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView"
