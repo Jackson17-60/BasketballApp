@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.cardview.RecyclerView.ChatRecylerViewAdapter;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,8 +30,10 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ChatRecylerViewAdapter chatRecylerViewAdapter;
     private TextView chat_title;
+
+    private ImageView chatImg;
     private List<Message> messageList = new ArrayList<>();
-    private String senderID, groupId,groupName;
+    private String senderID, groupId,groupName,groupChatImage;
 
     private FirebaseFirestore db;
     private ListenerRegistration firestoreListenerRegistration;
@@ -46,8 +50,9 @@ public class ChatActivity extends AppCompatActivity {
         // Get group ID from intent
         groupId = getIntent().getStringExtra("group_id");
         groupName = getIntent().getStringExtra("group_name");
-        if (groupId == null || groupName == null) {
-            Log.e(TAG, "Group ID or group name is null");
+        groupChatImage = getIntent().getStringExtra("group_image");
+        if (groupId == null || groupName == null ||  groupChatImage == null) {
+            Log.e(TAG, "Group ID, group name or group chat image is null");
             finish();
             return;
         }
@@ -64,11 +69,19 @@ public class ChatActivity extends AppCompatActivity {
     }
     private void setupViews() {
         chat_title = findViewById(R.id.chat_title);
+        chatImg = findViewById(R.id.chatImage);
         recyclerView = findViewById(R.id.message_recycler_view);
         ImageButton sendButton = findViewById(R.id.send_button);
         EditText messageInput = findViewById(R.id.message_edit_text);
         ImageButton backBtn = findViewById(R.id.chatback_button);
         chat_title.setText(groupName);
+
+            Glide.with(this)
+                    .load(groupChatImage)
+                    .placeholder(R.drawable.upload)
+                    .circleCrop()
+                    .into(chatImg);
+
         backBtn.setOnClickListener(v -> onBackPressed());
         sendButton.setOnClickListener(v -> {
             String messageText = messageInput.getText().toString().trim();
@@ -136,21 +149,17 @@ public class ChatActivity extends AppCompatActivity {
                                     break;
                             }
                         }
+
+                        // Scrolling to the last position to show the latest message
                         if (!messageList.isEmpty()) {
                             recyclerView.post(() -> recyclerView.scrollToPosition(messageList.size() - 1));
                         }
                     } else {
                         Log.w(TAG, "Snapshot is null");
                     }
-
-
-
-                    // Scrolling to the last position to show the latest message
-                    if (!messageList.isEmpty()) {
-                        recyclerView.post(() -> recyclerView.scrollToPosition(messageList.size() - 1));
-                    }
                 });
     }
+
     private void showDeleteConfirmationDialog(int position, String documentId) {
 
         androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ChatActivity.this, R.style.MaterialAlertDialog_rounded)

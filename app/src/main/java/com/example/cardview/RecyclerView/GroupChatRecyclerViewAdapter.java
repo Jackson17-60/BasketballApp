@@ -22,7 +22,7 @@ public class GroupChatRecyclerViewAdapter extends RecyclerView.Adapter<GroupChat
     }
 
     public interface OnGroupChatClickListener {
-        void onGroupChatClick(String groupId,String groupName);
+        void onGroupChatClick(String groupId,String groupName,String groupChatImage);
     }
 
     @NonNull
@@ -61,7 +61,7 @@ public class GroupChatRecyclerViewAdapter extends RecyclerView.Adapter<GroupChat
                 if (onGroupChatClickListener != null) {
                     int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        onGroupChatClickListener.onGroupChatClick(groupChatList.get(position).getId(),groupChatList.get(position).getName());
+                        onGroupChatClickListener.onGroupChatClick(groupChatList.get(position).getId(),groupChatList.get(position).getName(),groupChatList.get(position).getGroupImage());
                     }
                 }
             });

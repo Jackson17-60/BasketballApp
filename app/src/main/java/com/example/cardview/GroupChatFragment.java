@@ -60,10 +60,11 @@ public class GroupChatFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_group_chat, container, false);
         groupChatRecyclerView = view.findViewById(R.id.groupChatRecyclerView);
-        groupChatRecyclerViewAdapter = new GroupChatRecyclerViewAdapter(groupChatList, (groupId, groupName)-> {
+        groupChatRecyclerViewAdapter = new GroupChatRecyclerViewAdapter(groupChatList, (groupId, groupName,groupChatImage)-> {
             Intent intent = new Intent(getContext(), ChatActivity.class);
             intent.putExtra("group_id", groupId);
             intent.putExtra("group_name", groupName);
+            intent.putExtra("group_image", groupChatImage);
             startActivity(intent);
         });
         groupChatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

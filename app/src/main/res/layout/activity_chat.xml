@@ -24,6 +24,16 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/baseline_arrow_back_24" />
 
+        <ImageView
+            android:id="@+id/chatImage"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/baseline_person_24"
+            android:layout_marginStart="10dp"
+            android:elevation="2dp"
+            android:background="@drawable/circular_background" />
+
         <TextView
             android:id="@+id/chat_title"
             android:layout_width="0dp"
