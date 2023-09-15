@@ -122,6 +122,9 @@ public class ChatActivity extends AppCompatActivity {
                                     break;
                             }
                         }
+                        if (!messageList.isEmpty()) {
+                            recyclerView.post(() -> recyclerView.scrollToPosition(messageList.size() - 1));
+                        }
                     } else {
                         Log.w(TAG, "Snapshot is null");
                     }
@@ -130,7 +133,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     // Scrolling to the last position to show the latest message
                     if (!messageList.isEmpty()) {
-                        recyclerView.scrollToPosition(messageList.size() - 1);
+                        recyclerView.post(() -> recyclerView.scrollToPosition(messageList.size() - 1));
                     }
                 });
     }

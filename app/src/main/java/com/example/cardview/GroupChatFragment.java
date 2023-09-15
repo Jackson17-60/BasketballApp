@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -21,7 +22,10 @@ import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +36,9 @@ public class GroupChatFragment extends Fragment{
     private RecyclerView groupChatRecyclerView;
     private GroupChatAdapter groupChatAdapter;
     private List<GroupChat> groupChatList = new ArrayList<>();
+    private static final String TAG = "GroupChatFragment";
 
+    private ListenerRegistration firestoreListener;
     private FloatingActionButton fab;
 
     public GroupChatFragment() {
@@ -80,22 +86,47 @@ public class GroupChatFragment extends Fragment{
 
     private void fetchGroupChats() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("groups")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        groupChatList.clear(); // Clear the existing list
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            GroupChat groupChat = document.toObject(GroupChat.class);
-                            groupChat.setId(document.getId());
-                            groupChatList.add(groupChat);
-                            groupChatAdapter.notifyItemInserted(groupChatList.size() - 1); // Notify about the newly inserted item
+        firestoreListener = db.collection("groups")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            GroupChat groupChat = dc.getDocument().toObject(GroupChat.class);
+                            groupChat.setId(dc.getDocument().getId());
+                            int index = dc.getNewIndex();
+
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    groupChatList.add(index, groupChat);
+                                    groupChatAdapter.notifyItemInserted(index);
+                                    break;
+
+                                case MODIFIED:
+                                    groupChatList.set(index, groupChat);
+                                    groupChatAdapter.notifyItemChanged(index);
+                                    break;
+
+                                case REMOVED:
+                                    int oldIndex = dc.getOldIndex();
+                                    if (oldIndex >= 0 && oldIndex < groupChatList.size()) {
+                                        groupChatList.remove(oldIndex);
+                                        groupChatAdapter.notifyItemRemoved(oldIndex);
+                                    }
+                                    break;
+                            }
                         }
                     } else {
-                        Log.w("Firebase", "Error getting documents.", task.getException());
+                        Log.w(TAG, "Snapshot is null");
                     }
                 });
     }
+
+
     private void setupFab(View view) {
         fab = view.findViewById(R.id.addGroupChat);
         fab.setOnClickListener(view1 -> {
@@ -109,5 +140,11 @@ public class GroupChatFragment extends Fragment{
         });
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (firestoreListener != null) {
+            firestoreListener.remove();  // Remove the snapshot listener when the view is destroyed
+        }
+    }
 }

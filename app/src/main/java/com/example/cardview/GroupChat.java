@@ -8,15 +8,25 @@ public class GroupChat implements Serializable {
     private String description;
     private String groupImage;
 
+
+    private long timestamp;
     public GroupChat() {
         // Empty constructor needed for Firestore
     }
 
-    public GroupChat(String id, String name, String description, String groupImage) {
+    public GroupChat(String id, String name, String description, String groupImage,long timestamp) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.groupImage = groupImage;
+        this.timestamp = timestamp;
+    }
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getId() {

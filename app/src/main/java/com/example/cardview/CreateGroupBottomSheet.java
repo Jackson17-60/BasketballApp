@@ -51,7 +51,7 @@ public class CreateGroupBottomSheet  extends BottomSheetDialogFragment {
         groupNameET = rootView.findViewById(R.id.groupNameET);
         groupDescriptionET = rootView.findViewById(R.id.groupDescriptionET);
         createGrpBtn = rootView.findViewById(R.id.createGrpBtn);
-        loadingIndicator = rootView.findViewById(R.id.loading_indicator);
+        loadingIndicator = rootView.findViewById(R.id.groupChatloading_indicator);
         createGrpBtn.setOnClickListener(v -> createGroup());
         groupImage.setOnClickListener(view1 ->
                 pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
@@ -65,6 +65,7 @@ public class CreateGroupBottomSheet  extends BottomSheetDialogFragment {
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             StorageReference groupImagesRef = storageRef.child("group_images/" + UUID.randomUUID().toString());
             if (uri != null) {
+                loadingIndicator.setVisibility(View.VISIBLE);
                 groupImagesRef.putFile(uri)
                         .addOnSuccessListener(taskSnapshot -> {
                             groupImagesRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
@@ -74,12 +75,12 @@ public class CreateGroupBottomSheet  extends BottomSheetDialogFragment {
                                             .load(imageUrl)
                                             .placeholder(R.drawable.upload)
                                             .into(groupImage);
-
                                 }
+                                loadingIndicator.setVisibility(View.GONE);  // Hide the progress bar here
                             });
                         })
                         .addOnFailureListener(e -> {
-                            loadingIndicator.setVisibility(View.GONE);
+                            loadingIndicator.setVisibility(View.GONE);  // Hide the progress bar here
                             Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
                         });
             }else{
@@ -105,29 +106,30 @@ public class CreateGroupBottomSheet  extends BottomSheetDialogFragment {
         }
 
         // Show loading indicator
-        loadingIndicator.setVisibility(View.VISIBLE);
+
 
         // Create a new group chat object
+        long timestamp = System.currentTimeMillis();
         GroupChat newGroupChat = new GroupChat();
         newGroupChat.setName(groupName);
         newGroupChat.setDescription(groupDescription);
         newGroupChat.setGroupImage(imageUrl);
-        // Add an empty or default group image URL here
-        // newGroupChat.setGroupImage("URL_HERE");
+        newGroupChat.setTimestamp(timestamp);
 
         // Save the new group chat to Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        loadingIndicator.setVisibility(View.VISIBLE);
         db.collection("groups")
                 .add(newGroupChat)
                 .addOnSuccessListener(documentReference -> {
                     String groupId = documentReference.getId();
                     newGroupChat.setId(groupId);
                     db.collection("groups").document(groupId).set(newGroupChat);
-                    loadingIndicator.setVisibility(View.GONE);
                     if(isAdded()){
                         Toast.makeText(getContext(), "Group created successfully", Toast.LENGTH_SHORT).show();
 
                     }
+                    loadingIndicator.setVisibility(View.GONE);  // Hide the progress bar here
                     dismiss();
                 })
                 .addOnFailureListener(e -> {

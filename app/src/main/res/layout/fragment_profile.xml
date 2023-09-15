@@ -1,65 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:id="@+id/profileFrameLayout"
+    android:clipToPadding="true"
     tools:context=".ProfileFragment">
-    <ImageView
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_logout"
-        android:contentDescription="@string/log_out" />
 
+    <!-- Top Bar Layout -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="14dp">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="2dp"
+        android:orientation="horizontal">
 
+        <!-- Personal Information TextView -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="16dp"
+            android:text="Personal Information"
+            android:textColor="@color/light_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Logout ImageView -->
+        <ImageView
+            android:id="@+id/logoutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/log_out"
+            android:src="@drawable/ic_logout" />
+    </LinearLayout>
+
+    <!-- Profile Picture and Details Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Profile Picture CardView -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             app:cardCornerRadius="100dp">
 
             <ImageView
                 android:id="@+id/profilePic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/upload" />
+                android:scaleType="centerCrop" />
         </androidx.cardview.widget.CardView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="18sp"
-            android:textColor="@color/light_black"
-            android:text="Personal Information" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/profile_background"
-        android:elevation="2dp"
-        android:orientation="vertical">
-
-
         <LinearLayout
-            android:id="@+id/nameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_effect"
-            android:padding="16dp">
+            android:background="@drawable/profile_background"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:elevation="1dp"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:id="@+id/nameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/ripple_effect"
+                android:padding="12dp">
 
                 <ImageView
                     android:id="@+id/nameIcon"
@@ -77,42 +95,42 @@
                     android:textSize="16sp"
                     android:textColor="#b6b6b6"/>
 
-            <TextView
-                android:id="@+id/nameTextView"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/nameTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="end" />
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="#b6b6b6"
+                    android:gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical|end" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="350dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/custom_divider"/>
+
+            <LinearLayout
+                android:id="@+id/genderLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_gravity="center_vertical|end"
-                android:textColor="@color/light_black"
-                android:textSize="16sp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="10dp"
-                android:gravity="end" />
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:tint="#b6b6b6"
-                android:gravity="end"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center_vertical|end" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="350dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/custom_divider"/>
-
-        <LinearLayout
-            android:id="@+id/genderLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_effect"
-            android:padding="16dp">
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/ripple_effect"
+                android:padding="12dp">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -128,42 +146,42 @@
                     android:textSize="16sp"
                     android:textColor="#b6b6b6"/>
 
-            <TextView
-                android:id="@+id/genderTextView"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/genderTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="end" />
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="#b6b6b6"
+                    android:gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical|end" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="350dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/custom_divider"/>
+
+            <LinearLayout
+                android:id="@+id/heightLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_gravity="center_vertical|end"
-                android:textColor="@color/light_black"
-                android:textSize="16sp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="10dp"
-                android:gravity="end" />
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:tint="#b6b6b6"
-                android:gravity="end"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center_vertical|end" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="350dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/custom_divider"/>
-
-        <LinearLayout
-            android:id="@+id/heightLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_effect"
-            android:padding="16dp">
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/ripple_effect"
+                android:padding="12dp">
 
 
                 <ImageView
@@ -181,46 +199,46 @@
                     android:textColor="#b6b6b6"/>
 
 
-            <TextView
-                android:id="@+id/heightTextView"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/heightTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="end" />
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="#b6b6b6"
+                    android:gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical|end" />
+
+
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="350dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/custom_divider" />
+
+            <LinearLayout
+                android:id="@+id/levelLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_gravity="center_vertical|end"
-                android:textColor="@color/light_black"
-                android:textSize="16sp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="10dp"
-                android:gravity="end" />
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:tint="#b6b6b6"
-                android:gravity="end"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center_vertical|end" />
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/ripple_effect"
+                android:padding="12dp">
 
-
-        </LinearLayout>
-
-
-        <View
-            android:layout_width="350dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/custom_divider" />
-
-        <LinearLayout
-            android:id="@+id/levelLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_effect"
-            android:padding="16dp">
-
-            <!-- Left side: First ImageView and TextView -->
+                <!-- Left side: First ImageView and TextView -->
 
                 <ImageView
                     android:layout_width="24dp"
@@ -238,84 +256,84 @@
                     android:textColor="#b6b6b6"/>
 
 
-            <TextView
-                android:id="@+id/levelTextView"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/levelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="end" />
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="#b6b6b6"
+                    android:gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical|end" />
+
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="350dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/custom_divider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_gravity="center_vertical|end"
-                android:textColor="@color/light_black"
-                android:textSize="16sp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="10dp"
-                android:gravity="end" />
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:tint="#b6b6b6"
-                android:gravity="end"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center_vertical|end" />
+                android:id="@+id/locationLayout"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/ripple_effect"
+                android:padding="12dp">
 
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/baseline_location" />
 
-
-        <View
-            android:layout_width="350dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/custom_divider" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/locationLayout"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_effect"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/baseline_location" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Address"
-                android:layout_gravity="center_vertical"
-                android:textColor="#b6b6b6"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="#b6b6b6"
+                    android:textSize="16sp" />
 
 
 
-            <TextView
-                android:id="@+id/locationTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_gravity="center_vertical|end"
-                android:textColor="@color/light_black"
-                android:textSize="16sp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="10dp"
-                android:gravity="end" />
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/baseline_arrow_forward_ios_24"
-                app:tint="#b6b6b6"
-                android:gravity="end"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center_vertical|end" />
+                <TextView
+                    android:id="@+id/locationTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="@color/light_black"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="10dp"
+                    android:gravity="end" />
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/baseline_arrow_forward_ios_24"
+                    app:tint="#b6b6b6"
+                    android:gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:layout_gravity="center_vertical|end" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
 
-
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>

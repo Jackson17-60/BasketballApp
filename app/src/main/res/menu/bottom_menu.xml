@@ -6,16 +6,18 @@
         android:title="Home"
         android:icon="@drawable/baseline_home_24"/>
 
-    <item
-        android:id="@+id/community"
-        android:title="Community"
-        android:icon="@drawable/baseline_video_library_24"
-        />
+
 
     <item
         android:id="@+id/about"
         android:icon="@drawable/baseline_sports_basketball_24"
         android:title="My Games"/>
+
+    <item
+        android:id="@+id/chat"
+        android:title="Chat"
+        android:icon="@drawable/ic_chat"
+        />
     <item
         android:id="@+id/profile"
         android:title="Profile"

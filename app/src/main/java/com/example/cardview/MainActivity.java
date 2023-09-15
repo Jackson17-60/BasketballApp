@@ -59,27 +59,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        firestore = FirebaseFirestore.getInstance();
-//        firestore.collection("games")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            // Access data from the document
-//                            String gameDate = document.getString("date");
-//                            // Handle the data as needed
-//                        }
-//                    } else {
-//                        // Handle errors
-//                    }
-//                });
-
                 bottomNavigationView.setOnItemSelectedListener(item -> {
 
             int itemId = item.getItemId();
             if (itemId == R.id.home) {
                 replaceFragment(new HomeFragment());
-            } else if (itemId == R.id.community) {
+            } else if (itemId == R.id.chat) {
                 replaceFragment(new GroupChatFragment());
             } else if (itemId == R.id.about) {
                 replaceFragment(new MyGameFragment());
