@@ -8,7 +8,9 @@ plugins {
 android {
     namespace = "com.example.cardview"
     compileSdk = 33
-
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
         applicationId = "com.example.cardview"
         minSdk = 33
@@ -83,6 +85,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.7")
+    implementation ("com.google.firebase:firebase-messaging:23.2.1")
 
 
 }

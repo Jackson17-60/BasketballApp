@@ -1,24 +1,32 @@
 package com.example.cardview;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cardview.databinding.UpcomingGamesLayoutBinding;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> implements Filterable {
     private List<Game> gameList;
-    private List<Game> gameListFull; // List to hold all the items
+    private List<Game> gameListFull;
     private OnItemClickListener onItemClickListener;
     private OnDataChangeListener onDataChangeListener;
+    private int[] colors;
+    private final Random rnd = new Random();
 
     public interface OnDataChangeListener{
         void onDataChanged(int size);
@@ -38,20 +46,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.upcoming_games_layout, parent, false);
-        return new ViewHolder(view, onItemClickListener);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        UpcomingGamesLayoutBinding binding = UpcomingGamesLayoutBinding.inflate(inflater, parent, false);
+        return new ViewHolder(binding, onItemClickListener);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Game gameData = gameList.get(position);
+        Context context = holder.binding.getRoot().getContext();
+        colors = context.getResources().getIntArray(R.array.color_array);
+        int color = colors[rnd.nextInt(colors.length)];
+        holder.binding.bkbIcon.setColorFilter(color);
 
-//        holder.imageView.setImageResource(gameData.get());
-        holder.GameDate.setText(gameData.getDate());
-        holder.GameTime.setText(gameData.getTime());
-        holder.GamePlayer.setText(gameData.getParticipantCount()+"/"+gameData.getNumOfPlayer());
-        holder.GameLevel.setText(gameData.getLevel());
-        holder.GameLocation.setText(gameData.getLocation());
+        holder.binding.gameDateTime.setText(gameData.getDate() + " @ "  +gameData.getTime());
+        holder.binding.numOfPlayer.setText(gameData.getParticipantCount()+"/"+gameData.getNumOfPlayer());
+        holder.binding.gameLocation.setText(gameData.getLocation());
     }
 
 
@@ -61,19 +72,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-//        ImageView imageView;
-        TextView GameDate, GameTime, GameLocation,GamePlayer,GameLevel;
+        UpcomingGamesLayoutBinding binding;
 
-        public ViewHolder(@NonNull View itemView,final OnItemClickListener listener) {
-            super(itemView);
-//            imageView = itemView.findViewById(R.id.card_image);
-            GameDate = itemView.findViewById(R.id.game_date);
-            GameTime = itemView.findViewById(R.id.game_time);
-            GameLocation = itemView.findViewById(R.id.game_location);
-            GameLevel = itemView.findViewById(R.id.game_level);
-            GamePlayer = itemView.findViewById(R.id.numOfPlayer);
+        public ViewHolder(@NonNull UpcomingGamesLayoutBinding binding, final OnItemClickListener listener) {
+            super(binding.getRoot());
+            this.binding = binding;
 
-            itemView.setOnClickListener(v -> {
+            binding.getRoot().setOnClickListener(v -> {
                 int position = getAbsoluteAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     listener.onItemClick(gameList.get(position));
@@ -81,12 +86,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             });
         }
     }
-    public void updateData(List<Game> newGameList) {
-        this.gameList.clear();
-        this.gameList.addAll(newGameList);
-        notifyDataSetChanged();
-        Log.d("RecyclerViewAdapter", "Data updated. gameList size: " + gameList.size() + ", gameListFull size: " + gameListFull.size());
-    }
+//    public void updateData(List<Game> newGameList) {
+//        this.gameList.clear();
+//        this.gameList.addAll(newGameList);
+//        notifyDataSetChanged();
+//    }
     public void updateFullDataList(List<Game> newFullDataList) {
         this.gameListFull.clear();
         this.gameListFull.addAll(newFullDataList);

@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference databaseRef;
     FirebaseAuth database ;
     String height,gender, location, level, name,profileImg;
-    ProfileFragment profileFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.home) {
                 replaceFragment(new HomeFragment());
-            } else if (itemId == R.id.video) {
-                replaceFragment(new NewsFragment());
+            } else if (itemId == R.id.community) {
+                replaceFragment(new GroupChatFragment());
             } else if (itemId == R.id.about) {
-                replaceFragment(new AboutFragment());
+                replaceFragment(new MyGameFragment());
             } else if (itemId == R.id.profile) {
                 replaceFragment(new ProfileFragment(name , gender,  height,  level ,  location,profileImg ));
             }
@@ -98,5 +97,11 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseRef.addValueEventListener(null);
     }
 }

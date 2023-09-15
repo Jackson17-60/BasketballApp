@@ -1,59 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/AppBackgroundColor"
+    android:orientation="vertical"
     tools:context=".HomeFragment">
+
+        <TextView
+            android:id="@+id/games_count_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Games 0 "
+            android:textColor="@color/light_black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@color/white"
+            android:elevation="2dp"
+            android:padding="16dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/games_count_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Upcoming Games 0 "
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center"
-                    android:textColor="@color/light_blue" />
 
                 <Spinner
                     android:id="@+id/levelFilterSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:entries="@array/level_array"
-                    android:layout_gravity="end"
-                    android:padding="16dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/spinner_background"
                     android:elevation="8dp"
-                    android:backgroundTint="@color/white"
-                    android:layout_marginBottom="12dp"/>
+                    android:entries="@array/level_array"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_effect"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="@drawable/ripple_effect"
-                    android:id="@+id/recyclerView"
-                    android:orientation="horizontal"/>
+                    android:orientation="horizontal" />
         </LinearLayout>
-
-
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/add_games"
-            android:layout_margin="16dp"
-            android:layout_gravity="bottom|end"
-            android:src="@drawable/ic_add"
-            app:tint="@color/white"
-            app:backgroundTint="@color/main_blue"/>
-</FrameLayout>
+</LinearLayout>

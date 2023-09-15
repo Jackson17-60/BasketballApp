@@ -9,74 +9,65 @@
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="1dp"
         app:cardUseCompatPadding="true">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:orientation="vertical">
+            android:padding="12dp">
+
             <TextView
                 android:id="@+id/numOfPlayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
                 android:drawablePadding="8dp"
                 app:drawableStartCompat="@drawable/player"
                 android:text="NOP"
-                android:textColor="@color/light_blue"
-                android:textSize="16sp" />
+                android:textColor="@color/main_blue"
+                android:textSize="18sp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="20dp"
-                android:gravity="center_vertical">
+                android:layout_marginTop="35dp"
+                android:gravity="center_horizontal">
 
-                <TextView
-                    android:id="@+id/game_date"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                <ImageView
+                    android:id="@+id/bkbIcon"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_gravity="center|bottom"
+                    android:layout_marginEnd="5dp"
+                    app:tint="@color/main_blue"
+                    android:src="@drawable/baseline_sports_basketball_24" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Game Date"
-                    android:drawablePadding="8dp"
-                    app:drawableStartCompat="@drawable/ic_date"
-                    android:textSize="16sp" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/game_time"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Game Time"
-                    android:drawablePadding="8dp"
-                    app:drawableStartCompat="@drawable/ic_time"
-                    android:textSize="16sp" />
+                    <TextView
+                        android:id="@+id/game_dateTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Game Date Time"
+                        android:textColor="@color/main_blue"
+                        android:textSize="18sp" />
 
+                    <TextView
+                        android:id="@+id/game_location"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Game Location"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/game_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Game Location"
-                android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/baseline_location"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/game_level"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Game Level"
-                android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/baseline_level"
-                android:textSize="16sp" />
-        </LinearLayout>
+        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

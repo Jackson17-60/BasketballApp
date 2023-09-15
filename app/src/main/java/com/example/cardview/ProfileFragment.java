@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,8 +30,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,8 +50,9 @@ public class ProfileFragment extends Fragment {
 
 
     private TextView locationTv, heightTv, genderTv, levelTv, nameTv;
-    private ImageView imageViewProfilePicture;
+    private ImageView imageViewProfilePicture,logOutBtn;
     private LinearLayout nameLayout,genderLayout,heightLayout,levelLayout,locationLayout;
+
     private ActivityResultLauncher<PickVisualMediaRequest> pickMediaLauncher;
     FirebaseAuth database;
     FirebaseUser user;
@@ -154,7 +158,10 @@ public class ProfileFragment extends Fragment {
                             if (isAdded()) { // Ensure the fragment is attached to an activity
                                 Glide.with(ProfileFragment.this)
                                         .load(downloadUri)
+                                        .placeholder(R.drawable.upload)
                                         .into(imageViewProfilePicture);
+
+
                             }
                         })
                 ).addOnFailureListener(e -> {
@@ -174,6 +181,7 @@ public class ProfileFragment extends Fragment {
             // Load image with Glide
             Glide.with(this)
                     .load(profileImg)
+                    .placeholder(R.drawable.upload)
                     .into(imageViewProfilePicture);
         }
     }
@@ -195,6 +203,7 @@ public class ProfileFragment extends Fragment {
         heightLayout = view.findViewById(R.id.heightLayout);
         levelLayout = view.findViewById(R.id.levelLayout);
         locationLayout = view.findViewById(R.id.locationLayout);
+        logOutBtn = view.findViewById(R.id.logoutButton);
 
         setProfileData(name, gender, height, level, location, profileImg);
         // Fetch and set profile data from Firebase
@@ -226,7 +235,7 @@ public class ProfileFragment extends Fragment {
                     }
                     if (dataSnapshot.hasChild("profileImg")) {
                         profileImg = dataSnapshot.child("profileImg").getValue(String.class);
-                        Glide.with(ProfileFragment.this).load(profileImg).into(imageViewProfilePicture);
+                        Glide.with(ProfileFragment.this).load(profileImg).placeholder(R.drawable.upload).into(imageViewProfilePicture);
                     }
                 }}
             }
@@ -239,11 +248,11 @@ public class ProfileFragment extends Fragment {
         databaseRef.addValueEventListener(databaseRefListener);
 
 
-        imageViewProfilePicture.setOnClickListener(view1 ->
-                pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
-                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build())
-        );
+//        imageViewProfilePicture.setOnClickListener(view1 ->
+//                pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
+//                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+//                        .build())
+//        );
         setupClickListeners(view);
 
         return view;
@@ -354,7 +363,24 @@ public class ProfileFragment extends Fragment {
         }
         dialog.show();
     }
+    private void showLogOut() {
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                .setTitle("Log Out")
+                .setMessage("Are you sure you want to log out ?")
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    FirebaseAuth.getInstance().signOut();
+                    databaseRef.child("fcmToken").setValue(null);
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                })
+                .create();
 
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
+        dialog.show();
+    }
     private void showLevelDialog() {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.level_layout, null);
 
@@ -425,10 +451,12 @@ public class ProfileFragment extends Fragment {
         genderLayout.setOnClickListener(v -> showGenderDialog());
         heightLayout.setOnClickListener(v -> showHeightDialog());
         levelLayout.setOnClickListener(v -> showLevelDialog());
-//        locationLayout.setOnClickListener(v -> showLocationDialog());
+        logOutBtn.setOnClickListener(v -> showLogOut());
 
         locationLayout.setOnClickListener(v -> launcher.launch(location));
     }
+
+
 
     public void setProfileData(String gender, String height, String level, String location, String name, String profileImg) {
         if (gender != null && !gender.isEmpty()) {
@@ -453,7 +481,7 @@ public class ProfileFragment extends Fragment {
         }
 
         if (profileImg != null && !profileImg.isEmpty()) {
-            Glide.with(ProfileFragment.this).load(profileImg).into(imageViewProfilePicture);
+            Glide.with(ProfileFragment.this).load(profileImg).placeholder(R.drawable.upload).into(imageViewProfilePicture);
         }
     }
 

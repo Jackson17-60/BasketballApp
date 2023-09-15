@@ -15,6 +15,7 @@ public class User {
     private String height; // You can use int or double depending on your requirements
     private String level;
     private String location;
+    private String fcmToken;
 
     // Constructors (default and parameterized)
 
@@ -34,8 +35,16 @@ public class User {
     }
     // Getters and Setters
 
+    public String getFcmToken() {
+        return fcmToken;
+    }
 
-    public String getPassword() {
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+
+public String getPassword() {
         return password;
     }
 

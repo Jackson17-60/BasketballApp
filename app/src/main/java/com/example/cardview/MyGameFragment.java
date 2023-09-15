@@ -1,6 +1,11 @@
 package com.example.cardview;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,16 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,87 +31,57 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnDataChangeListener {
-
+public class MyGameFragment extends Fragment implements RecyclerViewAdapter.OnDataChangeListener {
+    private RecyclerViewAdapter adapter;
+    private DatabaseReference gamesReference;
+    private ChildEventListener childEventListener;
     private RecyclerView recyclerView;
     private List<Game> gameListFull = new ArrayList<>();
-    private String currentFilter = null;
-    private ChildEventListener childEventListener;
     private FirebaseAuth firebaseAuth ;
     private FirebaseUser currentUser ;
-    private RecyclerViewAdapter adapter;
+    private FloatingActionButton fab;
     private final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.US);
-    DatabaseReference gamesReference;
 
-    private Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            Date currentDate = new Date();
-            for (int i = gameListFull.size() - 1; i >= 0; i--) {
-                Game game = gameListFull.get(i);
-                try {
-                    Date gameDate = sdf.parse(game.getDate() + " " + game.getTime());
-                    if (gameDate != null && gameDate.before(currentDate)) {
-                        gameListFull.remove(i);
-                        adapter.notifyItemRemoved(i);
-                    }
-                } catch (ParseException e) {
-                   e.printStackTrace();
-                }
-            }
-            handler.postDelayed(this, 60000); // Check every minute
-        }
-    };
-
-
-    public HomeFragment() {
+    public MyGameFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_mygame, container, false);
         setupFirebaseDatabase();
         setupRecyclerViewAndAdapter(view);
-        setupLevelFilterSpinner(view);
-
+        setupFab(view);
         return view;
     }
+    private void setupFab(View view) {
+        fab = view.findViewById(R.id.add_games);
+        fab.setOnClickListener(view1 -> {
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                CustomBottomSheet bottomSheet = new CustomBottomSheet(null);
+                bottomSheet.show(activity.getSupportFragmentManager(), "CustomBottomSheet");
+            } else {
+                Log.e("HomeFragment", "Activity is null");
+            }
+        });
+    }
     private void setupRecyclerViewAndAdapter(View view) {
-        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.myGamerecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
         adapter = new RecyclerViewAdapter(gameListFull, getOnItemClickListener());
         adapter.setOnDataChangeListener(this);
         recyclerView.setAdapter(adapter);
     }
-
-
-    private void setupLevelFilterSpinner(View view) {
-        Spinner levelFilterSpinner = view.findViewById(R.id.levelFilterSpinner);
-        levelFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                currentFilter = (String) parent.getItemAtPosition(position);
-                if ("All Levels".equals(currentFilter)) {
-                    currentFilter = null;
-                }
-                adapter.getFilter().filter(currentFilter);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
-
     private void setupFirebaseDatabase() {
         gamesReference = FirebaseDatabase.getInstance().getReference().child("games");
         firebaseAuth = FirebaseAuth.getInstance();
@@ -155,10 +120,10 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
 
         if (game != null) {
             try {
-                if (currentUser != null && !game.getHost().equals(currentUser.getUid())) {
+                if (currentUser != null && game.getHost().equals(currentUser.getUid())) {
                     addGameToTheList(game);
                 } else {
-                    Log.d("Firebase", "No Game Found");
+                    Log.d("Firebase", "The game is not hosted by the current user");
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -168,7 +133,6 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
             Log.d("Firebase", "Game is null");
         }
     }
-
     private void addGameToTheList(Game game) throws ParseException {
         Date gameDate = sdf.parse(game.getDate() + " " + game.getTime());
         Date currentDate = new Date();
@@ -178,12 +142,13 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
             adapter.updateFullDataList(gameListFull);
             adapter.notifyItemInserted(0);
             recyclerView.scrollToPosition(0);
-            adapter.getFilter().filter(currentFilter);
+            adapter.getFilter().filter(null);
         } else {
             Log.d("Firebase", "Game date is null or not after the current date");
         }
     }
     private void handleChildChanged(@NonNull DataSnapshot dataSnapshot) {
+        Log.d("test bro","test");
         String gameId = dataSnapshot.getKey();
         DataSnapshot detailsSnapshot = dataSnapshot.child("details");
         Game game = detailsSnapshot.getValue(Game.class);
@@ -196,7 +161,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
                     game.setParticipantCount(participantCount);
                     gameListFull.set(i, game); // Update gameListFull first
                     adapter.updateFullDataList(gameListFull); // Update full data list in adapter
-                    adapter.getFilter().filter(currentFilter); // This will update gameList and refresh the RecyclerView
+                    adapter.getFilter().filter(null); // This will update gameList and refresh the RecyclerView
                     break;
                 }
             }
@@ -218,7 +183,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
                 gameListFull.remove(i); // Remove from gameListFull here too
                 adapter.updateFullDataList(gameListFull); // Update full data list in adapter
                 adapter.notifyItemRemoved(i);
-                adapter.getFilter().filter(currentFilter);
+                adapter.getFilter().filter(null);
                 break;
             }
         }
@@ -229,41 +194,29 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             FragmentActivity activity = getActivity();
             if (currentUser != null && activity != null) {
-                    GameDetailBottomSheet bottomSheetFragment = new GameDetailBottomSheet(game);
-                    bottomSheetFragment.show(activity.getSupportFragmentManager(), bottomSheetFragment.getTag());
+                    CustomBottomSheet bottomSheet = new CustomBottomSheet(game);
+                    bottomSheet.show(activity.getSupportFragmentManager(), bottomSheet.getTag());
             } else {
-                Log.e("HomeFragment", "Current user is null or activity is null");
+                Log.e("My Game Fragment", "Current user is null or activity is null");
             }
         };
     }
 
-    private void updateGamesCount(int count) {
-        TextView gamesCountTextView = getView().findViewById(R.id.games_count_text_view);
-        gamesCountTextView.setText(String.format(Locale.US, "Games : %d", count));
-    }
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (gamesReference != null && childEventListener != null) {
+        if (childEventListener != null && gamesReference != null) {
             gamesReference.removeEventListener(childEventListener);
         }
         adapter = null;
         recyclerView = null;
-        handler.removeCallbacks(runnable); // Ensure to remove any lingering callbacks
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        handler.post(runnable); // Start the periodic task when the fragment is resumed
-    }
+        fab = null;
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        handler.removeCallbacks(runnable); // Stop the periodic task when the fragment is paused
     }
-
-
+    private void updateGamesCount(int count) {
+        TextView myGameCounter = getView().findViewById(R.id.myGameCounter);
+        myGameCounter.setText(String.format(Locale.US, "My Games : %d", count));
+    }
     @Override
     public void onDataChanged(int size) {
         updateGamesCount(size);

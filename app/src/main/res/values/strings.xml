@@ -42,5 +42,7 @@
     <string name="title_activity_maps">MapsActivity</string>
 
 
+
+    <string name="log_out">Log Out</string>
     <string name="api_key">AIzaSyBZVfsU9RWTh04vxBS5gHX5XQd2jvBSQtY</string>
 </resources>

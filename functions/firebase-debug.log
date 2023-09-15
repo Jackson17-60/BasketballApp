@@ -1,0 +1,64 @@
+[debug] [2023-09-14T00:29:35.885Z] ----------------------------------------------------------------------
+[debug] [2023-09-14T00:29:35.887Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Jackson\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve --only functions
+[debug] [2023-09-14T00:29:35.888Z] CLI Version:   12.5.4
+[debug] [2023-09-14T00:29:35.888Z] Platform:      win32
+[debug] [2023-09-14T00:29:35.888Z] Node Version:  v18.16.0
+[debug] [2023-09-14T00:29:35.889Z] Time:          Wed Sep 13 2023 17:29:35 GMT-0700 (Pacific Daylight Time)
+[debug] [2023-09-14T00:29:35.890Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-09-14T00:29:36.020Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-09-14T00:29:36.021Z] > authorizing via signed-in user (zijun0617@gmail.com)
+[debug] [2023-09-14T00:29:36.021Z] [iam] checking project basketball-3e266 for permissions ["firebase.projects.get"]
+[debug] [2023-09-14T00:29:36.024Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/basketball-3e266:testIamPermissions [none]
+[debug] [2023-09-14T00:29:36.024Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/basketball-3e266:testIamPermissions x-goog-quota-user=projects/basketball-3e266
+[debug] [2023-09-14T00:29:36.024Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/basketball-3e266:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-09-14T00:29:36.299Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/basketball-3e266:testIamPermissions 200
+[debug] [2023-09-14T00:29:36.299Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/basketball-3e266:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-09-14T00:29:36.300Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266 [none]
+[debug] [2023-09-14T00:29:36.601Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266 200
+[debug] [2023-09-14T00:29:36.601Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266 {"projectId":"basketball-3e266","projectNumber":"162612974797","displayName":"basketball","name":"projects/basketball-3e266","resources":{"hostingSite":"basketball-3e266","realtimeDatabaseInstance":"basketball-3e266-default-rtdb","storageBucket":"basketball-3e266.appspot.com","locationId":"us-central"},"state":"ACTIVE","etag":"1_d8c49e5f-f56c-4ccf-b271-453669a432c6"}
+[debug] [2023-09-14T00:29:36.605Z] defaultcredentials: writing to file C:\Users\Jackson\AppData\Roaming\firebase\zijun0617_gmail_com_application_default_credentials.json
+[debug] [2023-09-14T00:29:36.607Z] Setting GAC to C:\Users\Jackson\AppData\Roaming\firebase\zijun0617_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\Jackson\\AppData\\Roaming\\firebase\\zijun0617_gmail_com_application_default_credentials.json"}}
+[debug] [2023-09-14T00:29:36.608Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266/adminSdkConfig [none]
+[debug] [2023-09-14T00:29:36.823Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266/adminSdkConfig 200
+[debug] [2023-09-14T00:29:36.823Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/basketball-3e266/adminSdkConfig {"projectId":"basketball-3e266","databaseURL":"https://basketball-3e266-default-rtdb.firebaseio.com","storageBucket":"basketball-3e266.appspot.com","locationId":"us-central"}
+[info] i  functions: Watching "C:\Users\Jackson\AndroidStudioProjects\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Users\\Jackson\\AndroidStudioProjects\\functions\" for Cloud Functions..."}}
+[debug] [2023-09-14T00:29:36.852Z] Validating nodejs source
+[debug] [2023-09-14T00:29:38.561Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2023-09-14T00:29:38.561Z] Building nodejs source
+[debug] [2023-09-14T00:29:38.562Z] Failed to find version of module node: reached end of search path C:\Users\Jackson\AndroidStudioProjects\functions\node_modules
+[info] +  functions: Using node@18 from host. 
+[debug] [2023-09-14T00:29:38.564Z] Could not find functions.yaml. Must use http discovery
+[debug] [2023-09-14T00:29:38.569Z] Found firebase-functions binary at 'C:\Users\Jackson\AndroidStudioProjects\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8504
+
+[debug] [2023-09-14T00:29:39.140Z] Got response from /__/functions.yaml {"endpoints":{"notifyParticipantsOnGameDeletion":{"platform":"gcfv1","availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"serviceAccountEmail":null,"vpc":null,"eventTrigger":{"eventType":"providers/google.firebase.database/eventTypes/ref.delete","eventFilters":{"resource":"projects/_/instances/basketball-3e266-default-rtdb/refs/games/{gameId}"},"retry":false},"labels":{},"entryPoint":"notifyParticipantsOnGameDeletion"}},"specVersion":"v1alpha1","requiredAPIs":[]}
+[info] shutdown requested via /__/quitquitquit
+
+[info] +  functions: Loaded functions definitions from source: notifyParticipantsOnGameDeletion. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: notifyParticipantsOnGameDeletion."}}
+[info] i  functions[us-central1-notifyParticipantsOnGameDeletion]: function ignored because the database emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the database emulator does not exist or is not running."}}

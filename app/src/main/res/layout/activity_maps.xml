@@ -22,7 +22,6 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/layout_bottom_controls"
         android:layout_below="@+id/searchView"
-        android:layout_marginTop="-2dp"
         android:layout_marginBottom="2dp" />
 
     <ImageView

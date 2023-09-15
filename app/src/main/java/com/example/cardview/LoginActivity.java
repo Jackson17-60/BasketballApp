@@ -28,14 +28,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText passwordEditText;
+    private EditText passwordEditText,emailEditText;
     private TextView signUp;
     private ImageView showpassword,bkbLogo;
+    private boolean isActivityBeingDestroyed = false;
     private Button btnLogin;
     private ObjectAnimator bounceAnim;
     @Override
@@ -44,15 +46,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         bkbLogo = findViewById(R.id.bkb_logo);
         signUp = findViewById(R.id.sign_up);
+        emailEditText = findViewById(R.id.login_email);
          passwordEditText = findViewById(R.id.login_pass);
          btnLogin = findViewById(R.id.btn_login);
         showpassword = findViewById(R.id.show_password);
-        showpassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginController.togglePasswordVisibility(passwordEditText);
-            }
-        });
+        showpassword.setOnClickListener(v -> LoginController.togglePasswordVisibility(passwordEditText));
         bounceAnim = ObjectAnimator.ofFloat(bkbLogo, "translationY", 0, 30, 0);
         bounceAnim.setDuration(1000); // Duration in milliseconds
         bounceAnim.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -63,38 +61,53 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                animation.start(); // Restart the animation
+                if (!isActivityBeingDestroyed) {
+                    animation.start(); // Restart the animation
+                }
             }
         });
 
         // Start the bounce animation
         bounceAnim.start();
         passwordEditText.addTextChangedListener(new LoginController(showpassword));
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                String email = emailEditText.getText().toString();
-//                String password = passwordEditText.getText().toString();
-//                if (!LoginController.isInputValid(email, password)) {
-//                    LoginController.showEmptyFieldsToast(LoginActivity.this);
-//                    return; // Don't proceed with sign-up if fields are empty
-//                }
-                FirebaseApp.initializeApp(LoginActivity.this);
-                FirebaseAuth database = FirebaseAuth.getInstance();
-//                database.signInWithEmailAndPassword(email, password)
-                database.signInWithEmailAndPassword("1@gmail.com", "123456")
-                        .addOnCompleteListener(LoginActivity.this, task -> {
-                            if (task.isSuccessful()) {
-                                // Sign-in successful, user is authenticated
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                // Sign-in failed, handle the error
-                                Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+        btnLogin.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
+            if (!LoginController.isInputValidLogin(email, password)) {
+                LoginController.showEmptyFieldsToast(LoginActivity.this);
+                return; // Don't proceed with sign-up if fields are empty
             }
+            FirebaseApp.initializeApp(LoginActivity.this);
+            FirebaseAuth database = FirebaseAuth.getInstance();
+            database.signInWithEmailAndPassword(email, password)
+//                database.signInWithEmailAndPassword("1@gmail.com", "123456")
+                    .addOnCompleteListener(LoginActivity.this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign-in successful, user is authenticated
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            FirebaseMessaging.getInstance().getToken()
+                                    .addOnCompleteListener(tokenTask -> {
+                                        if (!tokenTask.isSuccessful()) {
+                                            Log.w("FCM", "Fetching FCM registration token failed", tokenTask.getException());
+                                            return;
+                                        }
+
+                                        // Get and set the new FCM registration token
+                                        String token = tokenTask.getResult();
+                                        DatabaseReference db = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                                        db.child("fcmToken").setValue(token)
+                                                .addOnSuccessListener(aVoid -> Log.d("FCM", "Token updated successfully"))
+                                                .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
+                                    });
+
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Sign-in failed, handle the error
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
 
         signUp.setOnClickListener(v -> {
@@ -108,7 +121,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        isActivityBeingDestroyed = true;
         bounceAnim.cancel();
+        passwordEditText = null;
+        signUp = null;
+        showpassword = null;
+        btnLogin = null;
+        bkbLogo = null;
     }
 
 

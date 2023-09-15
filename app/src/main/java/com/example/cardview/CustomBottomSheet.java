@@ -31,6 +31,7 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
@@ -399,18 +400,19 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         }
     }
     private void handleDeleteGameClick(View view) {
-        new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
                 .setTitle("Delete Game")
                 .setMessage("Are you sure you want to delete this game?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Continue with delete
-                        deleteGameFromDatabase();
-                    }
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    deleteGameFromDatabase();
                 })
-                .setNegativeButton(R.string.cancel, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
+        dialog.show();
     }
 
     private void deleteGameFromDatabase() {

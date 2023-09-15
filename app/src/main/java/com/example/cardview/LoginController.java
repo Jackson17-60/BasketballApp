@@ -49,6 +49,9 @@ public class LoginController implements TextWatcher {
         return  !TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)  && selectedRadioButtonId != -1;
     }
 
+    public static boolean isInputValidLogin(String email, String password ) {
+        return   !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) ;
+    }
     public static void showEmptyFieldsToast(Context context) {
         Toast.makeText(context, "Please fill in all the field", Toast.LENGTH_SHORT).show();
     }
