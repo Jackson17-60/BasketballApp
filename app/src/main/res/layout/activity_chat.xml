@@ -69,6 +69,7 @@
             android:background="@drawable/send_msg_bg"
             android:hint="Message" />
 
+
         <ImageButton
             android:id="@+id/send_button"
             android:layout_width="45dp"

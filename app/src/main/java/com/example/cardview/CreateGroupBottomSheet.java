@@ -53,11 +53,11 @@ public class CreateGroupBottomSheet  extends BottomSheetDialogFragment {
         createGrpBtn = rootView.findViewById(R.id.createGrpBtn);
         loadingIndicator = rootView.findViewById(R.id.groupChatloading_indicator);
         createGrpBtn.setOnClickListener(v -> createGroup());
-        groupImage.setOnClickListener(view1 ->
-                pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
-                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build())
-        );
+//        groupImage.setOnClickListener(view1 ->
+//                pickMediaLauncher.launch(new PickVisualMediaRequest.Builder()
+//                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+//                        .build())
+//        );
 
         setupClickListeners(rootView);
         pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {

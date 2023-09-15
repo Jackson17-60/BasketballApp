@@ -75,11 +75,6 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
 
         this.existingGame = existingGame;
     }
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

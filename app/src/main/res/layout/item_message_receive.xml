@@ -30,7 +30,7 @@
             android:text="Sender Name"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:paddingStart="8dp" />
+            android:paddingStart="11dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
