@@ -1,4 +1,4 @@
-package com.example.cardview;
+package com.example.cardview.Model_Class;
 
 import java.sql.Time;
 import java.util.Date;

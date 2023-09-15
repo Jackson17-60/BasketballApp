@@ -1,19 +1,22 @@
-package com.example.cardview;
+package com.example.cardview.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.example.cardview.R;
 import com.example.cardview.databinding.GroupchatLayoutBinding;
 import java.util.List;
 
-public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.GroupChatViewHolder> {
+import com.example.cardview.Model_Class.GroupChat;
+
+public class GroupChatRecyclerViewAdapter extends RecyclerView.Adapter<GroupChatRecyclerViewAdapter.GroupChatViewHolder> {
 
     private List<GroupChat> groupChatList;
     private OnGroupChatClickListener onGroupChatClickListener;
 
-    public GroupChatAdapter(List<GroupChat> groupChatList, OnGroupChatClickListener onGroupChatClickListener) {
+    public GroupChatRecyclerViewAdapter(List<GroupChat> groupChatList, OnGroupChatClickListener onGroupChatClickListener) {
         this.groupChatList = groupChatList;
         this.onGroupChatClickListener = onGroupChatClickListener;
     }

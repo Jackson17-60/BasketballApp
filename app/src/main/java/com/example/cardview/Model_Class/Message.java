@@ -1,4 +1,4 @@
-package com.example.cardview;
+package com.example.cardview.Model_Class;
 
 public class Message {
 
@@ -8,11 +8,20 @@ public class Message {
     private String messageText;
     private String senderUid;
     private long timestamp;
+    private String documentId;
     public  Message(){}
     public Message( String senderUid, String messageText, long timestamp) {
         this.senderUid = senderUid;
         this.messageText = messageText;
         this.timestamp = timestamp;
+    }
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
     public String getSenderName() {
         return senderName;

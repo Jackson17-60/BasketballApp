@@ -1,4 +1,4 @@
-package com.example.cardview;
+package com.example.cardview.RecyclerView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

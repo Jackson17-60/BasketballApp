@@ -1,11 +1,9 @@
-package com.example.cardview;
+package com.example.cardview.BottomSheet;
 
 import static com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_KEYBOARD;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,8 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.cardview.MapsActivity;
+import com.example.cardview.R;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
@@ -50,11 +49,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.example.cardview.Model_Class.Game;
 
-public class CustomBottomSheet extends BottomSheetDialogFragment {
+
+public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
     private static final String SUCCESS_MESSAGE = "Successfully created the game";
     private static final String FAILURE_MESSAGE = "Failed to create the new game";
-    private int layoutResId;
     private String selectedLevel, addDate, addTime, addGameLoc, addPlayers,selectedLocation;
     private RadioGroup levelRadioGroup;
     private Button addGameBtn,deleteGameBtn;
@@ -68,10 +68,10 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
     private ProgressBar loadingIndicator;
     private FirebaseDatabase database;
     private Game existingGame;
-    public CustomBottomSheet() {
+    public CreateEditGameBottomSheet() {
 
     }
-    public CustomBottomSheet(@Nullable Game existingGame) {
+    public CreateEditGameBottomSheet(@Nullable Game existingGame) {
 
         this.existingGame = existingGame;
     }
@@ -113,7 +113,6 @@ public class CustomBottomSheet extends BottomSheetDialogFragment {
         addGameBtn = rootView.findViewById(R.id.addgame_btn);
         deleteGameBtn = rootView.findViewById(R.id.delete_game_btn);
         gameStatus = rootView.findViewById(R.id.gameStatus);
-        loadingIndicator = rootView.findViewById(R.id.loading_indicator);
         if (existingGame != null) {
             populateFieldsForEditing(existingGame);
         }

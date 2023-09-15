@@ -14,6 +14,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cardview.BottomSheet.CreateEditGameBottomSheet;
+import com.example.cardview.RecyclerView.GameRecyclerViewAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,9 +32,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.cardview.Model_Class.Game;
 
-public class MyGameFragment extends Fragment implements RecyclerViewAdapter.OnDataChangeListener {
-    private RecyclerViewAdapter adapter;
+
+public class MyGameFragment extends Fragment implements GameRecyclerViewAdapter.OnDataChangeListener {
+    private GameRecyclerViewAdapter adapter;
     private DatabaseReference gamesReference;
     private ChildEventListener childEventListener;
     private RecyclerView recyclerView;
@@ -67,8 +71,8 @@ public class MyGameFragment extends Fragment implements RecyclerViewAdapter.OnDa
         fab.setOnClickListener(view1 -> {
             FragmentActivity activity = getActivity();
             if (activity != null) {
-                CustomBottomSheet bottomSheet = new CustomBottomSheet(null);
-                bottomSheet.show(activity.getSupportFragmentManager(), "CustomBottomSheet");
+                CreateEditGameBottomSheet bottomSheet = new CreateEditGameBottomSheet(null);
+                bottomSheet.show(activity.getSupportFragmentManager(), "CreateEditGameBottomSheet");
             } else {
                 Log.e("HomeFragment", "Activity is null");
             }
@@ -78,7 +82,7 @@ public class MyGameFragment extends Fragment implements RecyclerViewAdapter.OnDa
         recyclerView = view.findViewById(R.id.myGamerecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
-        adapter = new RecyclerViewAdapter(gameListFull, getOnItemClickListener());
+        adapter = new GameRecyclerViewAdapter(gameListFull, getOnItemClickListener());
         adapter.setOnDataChangeListener(this);
         recyclerView.setAdapter(adapter);
     }
@@ -189,12 +193,12 @@ public class MyGameFragment extends Fragment implements RecyclerViewAdapter.OnDa
         }
     }
 
-    private RecyclerViewAdapter.OnItemClickListener getOnItemClickListener() {
+    private GameRecyclerViewAdapter.OnItemClickListener getOnItemClickListener() {
         return game -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             FragmentActivity activity = getActivity();
             if (currentUser != null && activity != null) {
-                    CustomBottomSheet bottomSheet = new CustomBottomSheet(game);
+                    CreateEditGameBottomSheet bottomSheet = new CreateEditGameBottomSheet(game);
                     bottomSheet.show(activity.getSupportFragmentManager(), bottomSheet.getTag());
             } else {
                 Log.e("My Game Fragment", "Current user is null or activity is null");

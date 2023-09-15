@@ -1,48 +1,38 @@
 package com.example.cardview;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.example.cardview.RecyclerView.ChatRecylerViewAdapter;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import com.example.cardview.Model_Class.Message;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
     private RecyclerView recyclerView;
-    private ChatAdapter chatAdapter;
+    private ChatRecylerViewAdapter chatRecylerViewAdapter;
     private TextView chat_title;
     private List<Message> messageList = new ArrayList<>();
     private String senderID, groupId,groupName;
 
     private FirebaseFirestore db;
     private ListenerRegistration firestoreListenerRegistration;
-    private ActivityResultLauncher<PickVisualMediaRequest> pickMediaLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +80,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        chatAdapter = new ChatAdapter(messageList, senderID);
+        chatRecylerViewAdapter = new ChatRecylerViewAdapter(messageList, senderID);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(chatAdapter);
+        recyclerView.setAdapter(chatRecylerViewAdapter);
+
+        chatRecylerViewAdapter.setOnMessageLongClickListener((position, message) -> {
+            if (message.getSenderUid().equals(senderID)) {
+                showDeleteConfirmationDialog(position, message.getDocumentId());
+            }
+        });
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(chatRecylerViewAdapter);
+
     }
     private void setupFirestoreListener() {
         if (groupId == null) {
@@ -114,24 +113,25 @@ public class ChatActivity extends AppCompatActivity {
                     if (snapshots != null) {
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             Message message = dc.getDocument().toObject(Message.class);
+                            message.setDocumentId(dc.getDocument().getId());
                             int index = dc.getNewIndex();
 
                             switch (dc.getType()) {
                                 case ADDED:
                                     messageList.add(index, message);
-                                    chatAdapter.notifyItemInserted(index);
+                                    chatRecylerViewAdapter.notifyItemInserted(index);
                                     break;
 
                                 case MODIFIED:
                                     messageList.set(index, message);
-                                    chatAdapter.notifyItemChanged(index);
+                                    chatRecylerViewAdapter.notifyItemChanged(index);
                                     break;
 
                                 case REMOVED:
                                     int oldIndex = dc.getOldIndex();
                                     if (oldIndex >= 0 && oldIndex < messageList.size()) {
                                         messageList.remove(oldIndex);
-                                        chatAdapter.notifyItemRemoved(oldIndex);
+                                        chatRecylerViewAdapter.notifyItemRemoved(oldIndex);
                                     }
                                     break;
                             }
@@ -150,6 +150,43 @@ public class ChatActivity extends AppCompatActivity {
                         recyclerView.post(() -> recyclerView.scrollToPosition(messageList.size() - 1));
                     }
                 });
+    }
+    private void showDeleteConfirmationDialog(int position, String documentId) {
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(ChatActivity.this, R.style.MaterialAlertDialog_rounded)
+                .setTitle("Delete Message")
+                .setMessage("Are you sure you want to delete this message?")
+                .setNeutralButton(getString(R.string.cancel), (dialogInterface, which) -> dialogInterface.dismiss())
+                .setPositiveButton(getString(R.string.confirm), (dialogInterface, which) -> {
+                    deleteMessageFromFirestore(position, documentId);
+                })
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        }
+        dialog.show();
+
+    }
+
+    private void deleteMessageFromFirestore(int position, String documentId) {
+        if (position >= 0 && position < messageList.size()) {
+            db.collection("chat")
+                    .document(groupId)
+                    .collection("messages")
+                    .document(documentId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        // Log success
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "Error deleting document", e);
+                        Toast.makeText(ChatActivity.this, "Error deleting message.", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Log.w(TAG, "Invalid position: " + position);
+        }
     }
 
 

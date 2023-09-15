@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import com.example.cardview.BottomSheet.CreateGroupBottomSheet;
+import com.example.cardview.RecyclerView.GroupChatRecyclerViewAdapter;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
-import androidx.annotation.Nullable;
+
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -30,11 +31,13 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.cardview.Model_Class.GroupChat;
+
 public class GroupChatFragment extends Fragment{
 
 
     private RecyclerView groupChatRecyclerView;
-    private GroupChatAdapter groupChatAdapter;
+    private GroupChatRecyclerViewAdapter groupChatRecyclerViewAdapter;
     private List<GroupChat> groupChatList = new ArrayList<>();
     private static final String TAG = "GroupChatFragment";
 
@@ -57,14 +60,14 @@ public class GroupChatFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_group_chat, container, false);
         groupChatRecyclerView = view.findViewById(R.id.groupChatRecyclerView);
-        groupChatAdapter = new GroupChatAdapter(groupChatList, (groupId, groupName)-> {
+        groupChatRecyclerViewAdapter = new GroupChatRecyclerViewAdapter(groupChatList, (groupId, groupName)-> {
             Intent intent = new Intent(getContext(), ChatActivity.class);
             intent.putExtra("group_id", groupId);
             intent.putExtra("group_name", groupName);
             startActivity(intent);
         });
         groupChatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        groupChatRecyclerView.setAdapter(groupChatAdapter);
+        groupChatRecyclerView.setAdapter(groupChatRecyclerViewAdapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(groupChatRecyclerView.getContext(), LinearLayoutManager.VERTICAL);
         Context context = getContext();
         if (context != null) {
@@ -103,19 +106,19 @@ public class GroupChatFragment extends Fragment{
                             switch (dc.getType()) {
                                 case ADDED:
                                     groupChatList.add(index, groupChat);
-                                    groupChatAdapter.notifyItemInserted(index);
+                                    groupChatRecyclerViewAdapter.notifyItemInserted(index);
                                     break;
 
                                 case MODIFIED:
                                     groupChatList.set(index, groupChat);
-                                    groupChatAdapter.notifyItemChanged(index);
+                                    groupChatRecyclerViewAdapter.notifyItemChanged(index);
                                     break;
 
                                 case REMOVED:
                                     int oldIndex = dc.getOldIndex();
                                     if (oldIndex >= 0 && oldIndex < groupChatList.size()) {
                                         groupChatList.remove(oldIndex);
-                                        groupChatAdapter.notifyItemRemoved(oldIndex);
+                                        groupChatRecyclerViewAdapter.notifyItemRemoved(oldIndex);
                                     }
                                     break;
                             }

@@ -1,4 +1,4 @@
-package com.example.cardview;
+package com.example.cardview.Controller;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

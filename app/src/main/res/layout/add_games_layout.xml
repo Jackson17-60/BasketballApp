@@ -372,15 +372,15 @@
 
         </LinearLayout>
     </LinearLayout>
+
     <ProgressBar
         android:id="@+id/loading_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"/>
-
-
+        style="?android:attr/progressBarStyle"
+        android:indeterminateDrawable="@drawable/progress_icon"/>
 
 
 </FrameLayout>

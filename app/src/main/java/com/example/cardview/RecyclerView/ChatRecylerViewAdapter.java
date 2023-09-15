@@ -1,14 +1,14 @@
-package com.example.cardview;
+package com.example.cardview.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.example.cardview.RecyclerView.ReceivedMessageViewHolder;
+import com.example.cardview.RecyclerView.SentMessageViewHolder;
 import com.example.cardview.databinding.ItemMessageMeBinding;
 import com.example.cardview.databinding.ItemMessageReceiveBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -22,17 +22,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+import com.example.cardview.Model_Class.Message;
+import com.example.cardview.Model_Class.User;
+
+public class ChatRecylerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_ME = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
     private DatabaseReference databaseReference;
     private List<Message> messages;
     private String currentUserId;
 
-    public ChatAdapter(List<Message> messages, String currentUserId) {
+    public ChatRecylerViewAdapter(List<Message> messages, String currentUserId) {
         this.messages = messages;
         this.currentUserId = currentUserId;
         this.databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+    }
+
+
+    public interface OnMessageLongClickListener {
+        void onMessageLongClick(int position, Message message);
+    }
+
+    private OnMessageLongClickListener onMessageLongClickListener;
+
+    public void setOnMessageLongClickListener(OnMessageLongClickListener listener) {
+        this.onMessageLongClickListener = listener;
     }
 
     @NonNull
@@ -53,7 +67,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
         String formattedTime = formatTimestamp(message.getTimestamp());
-
+        holder.itemView.setOnLongClickListener(v -> {
+            if (onMessageLongClickListener != null) {
+                onMessageLongClickListener.onMessageLongClick(position, message);
+            }
+            return true;
+        });
         if (holder.getItemViewType() == VIEW_TYPE_ME) {
             SentMessageViewHolder sendMsgViewHolder = (SentMessageViewHolder) holder;
             sendMsgViewHolder.bind(message.getMessageText(), formattedTime);
@@ -71,7 +90,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Log.w("ChatAdapter", "Database read failed", error.toException());
+                    Log.w("ChatRecylerViewAdapter", "Database read failed", error.toException());
                 }
             });
         }

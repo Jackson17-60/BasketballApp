@@ -15,13 +15,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.cardview.BottomSheet.GameDetailBottomSheet;
+import com.example.cardview.RecyclerView.GameRecyclerViewAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -37,8 +36,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.cardview.Model_Class.Game;
 
-public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnDataChangeListener {
+
+public class HomeFragment extends Fragment implements GameRecyclerViewAdapter.OnDataChangeListener {
 
     private RecyclerView recyclerView;
     private List<Game> gameListFull = new ArrayList<>();
@@ -46,7 +47,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
     private ChildEventListener childEventListener;
     private FirebaseAuth firebaseAuth ;
     private FirebaseUser currentUser ;
-    private RecyclerViewAdapter adapter;
+    private GameRecyclerViewAdapter adapter;
     private final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.US);
     DatabaseReference gamesReference;
 
@@ -95,7 +96,7 @@ public class HomeFragment extends Fragment implements RecyclerViewAdapter.OnData
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
-        adapter = new RecyclerViewAdapter(gameListFull, getOnItemClickListener());
+        adapter = new GameRecyclerViewAdapter(gameListFull, getOnItemClickListener());
         adapter.setOnDataChangeListener(this);
         recyclerView.setAdapter(adapter);
     }
@@ -226,7 +227,7 @@ private void setupLevelFilterSpinner(View view) {
         }
     }
 
-    private RecyclerViewAdapter.OnItemClickListener getOnItemClickListener() {
+    private GameRecyclerViewAdapter.OnItemClickListener getOnItemClickListener() {
         return game -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             FragmentActivity activity = getActivity();

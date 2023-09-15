@@ -1,26 +1,24 @@
-package com.example.cardview;
+package com.example.cardview.RecyclerView;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cardview.R;
 import com.example.cardview.databinding.UpcomingGamesLayoutBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> implements Filterable {
+import com.example.cardview.Model_Class.Game;
+
+public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerViewAdapter.ViewHolder> implements Filterable {
     private List<Game> gameList;
     private List<Game> gameListFull;
     private OnItemClickListener onItemClickListener;
@@ -35,7 +33,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener){
         this.onDataChangeListener = onDataChangeListener;
     }
-    public RecyclerViewAdapter(List<Game> gameList, OnItemClickListener onItemClickListener) {
+    public GameRecyclerViewAdapter(List<Game> gameList, OnItemClickListener onItemClickListener) {
         this.gameList = gameList;
         this.onItemClickListener = onItemClickListener;
         this.gameListFull = new ArrayList<>(gameList); // Initialize with all the items

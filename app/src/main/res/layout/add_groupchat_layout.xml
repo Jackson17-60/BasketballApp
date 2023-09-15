@@ -81,26 +81,33 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_divider" />
-        <Button
-            android:id="@+id/createGrpBtn"
+
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/blue_fill_rounded_color"
-            android:text="Create"
-            android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:gravity="center">
+            <Button
+                android:id="@+id/createGrpBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/blue_fill_rounded_color"
+                android:text="Create"
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
+            <ProgressBar
+                android:id="@+id/groupChatloading_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                style="?android:attr/progressBarStyle"
+                android:indeterminateDrawable="@drawable/progress_icon"/>
 
-
+        </FrameLayout>
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/groupChatloading_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"/>
 
 
 
