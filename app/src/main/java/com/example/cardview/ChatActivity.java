@@ -102,8 +102,7 @@ public class ChatActivity extends AppCompatActivity {
                 showDeleteConfirmationDialog(position, message.getDocumentId());
             }
         });
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(chatRecylerViewAdapter);
+
 
     }
     private void setupFirestoreListener() {
@@ -220,5 +219,7 @@ public class ChatActivity extends AppCompatActivity {
         if (firestoreListenerRegistration != null) {
             firestoreListenerRegistration.remove();
         }
+        chat_title = null;
+        chatImg = null;
     }
 }

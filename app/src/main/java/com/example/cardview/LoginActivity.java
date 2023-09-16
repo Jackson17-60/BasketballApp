@@ -34,13 +34,26 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        initializeViews();
+        setupAnimations();
+        setupListeners();
+    }
+    private void initializeViews() {
         bkbLogo = findViewById(R.id.bkb_logo);
         signUp = findViewById(R.id.sign_up);
         emailEditText = findViewById(R.id.login_email);
-         passwordEditText = findViewById(R.id.login_pass);
-         btnLogin = findViewById(R.id.btn_login);
+        passwordEditText = findViewById(R.id.login_pass);
+        btnLogin = findViewById(R.id.btn_login);
         showpassword = findViewById(R.id.show_password);
+    }
+    private void setupListeners() {
         showpassword.setOnClickListener(v -> LoginController.togglePasswordVisibility(passwordEditText));
+        passwordEditText.addTextChangedListener(new LoginController(showpassword));
+
+        btnLogin.setOnClickListener(v -> handleLoginClick());
+        signUp.setOnClickListener(v -> handleSignUpClick());
+    }
+    private void setupAnimations() {
         bounceAnim = ObjectAnimator.ofFloat(bkbLogo, "translationY", 0, 30, 0);
         bounceAnim.setDuration(1000); // Duration in milliseconds
         bounceAnim.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -59,55 +72,54 @@ public class LoginActivity extends AppCompatActivity {
 
         // Start the bounce animation
         bounceAnim.start();
-        passwordEditText.addTextChangedListener(new LoginController(showpassword));
-        btnLogin.setOnClickListener(v -> {
-            String email = emailEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
-            if (!LoginController.isInputValidLogin(email, password)) {
-                LoginController.showEmptyFieldsToast(LoginActivity.this);
-                return; // Don't proceed with sign-up if fields are empty
-            }
-            FirebaseApp.initializeApp(LoginActivity.this);
-            FirebaseAuth database = FirebaseAuth.getInstance();
-            database.signInWithEmailAndPassword(email, password)
-//                database.signInWithEmailAndPassword("1@gmail.com", "123456")
-                    .addOnCompleteListener(LoginActivity.this, task -> {
-                        if (task.isSuccessful()) {
-                            // Sign-in successful, user is authenticated
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            FirebaseMessaging.getInstance().getToken()
-                                    .addOnCompleteListener(tokenTask -> {
-                                        if (!tokenTask.isSuccessful()) {
-                                            Log.w("FCM", "Fetching FCM registration token failed", tokenTask.getException());
-                                            return;
-                                        }
-
-                                        // Get and set the new FCM registration token
-                                        String token = tokenTask.getResult();
-                                        DatabaseReference db = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
-                                        db.child("fcmToken").setValue(token)
-                                                .addOnSuccessListener(aVoid -> Log.d("FCM", "Token updated successfully"))
-                                                .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
-                                    });
-
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            // Sign-in failed, handle the error
-                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        });
-
-        signUp.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-            startActivity(intent);
-            finish();
-
-        });
-
     }
+    private void handleSignUpClick() {
+        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+
+    private void handleLoginClick() {
+        String email = emailEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+        if (!LoginController.isInputValidLogin(email, password)) {
+            LoginController.showEmptyFieldsToast(LoginActivity.this);
+            return; // Don't proceed with sign-up if fields are empty
+        }
+        FirebaseApp.initializeApp(LoginActivity.this);
+        FirebaseAuth database = FirebaseAuth.getInstance();
+        database.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(LoginActivity.this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign-in successful, user is authenticated
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        FirebaseMessaging.getInstance().getToken()
+                                .addOnCompleteListener(tokenTask -> {
+                                    if (!tokenTask.isSuccessful()) {
+                                        Log.w("FCM", "Fetching FCM registration token failed", tokenTask.getException());
+                                        return;
+                                    }
+
+                                    // Get and set the new FCM registration token
+                                    String token = tokenTask.getResult();
+                                    DatabaseReference db = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                                    db.child("fcmToken").setValue(token)
+                                            .addOnSuccessListener(aVoid -> Log.d("FCM", "Token updated successfully"))
+                                            .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
+                                });
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Sign-in failed, handle the error
+                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
