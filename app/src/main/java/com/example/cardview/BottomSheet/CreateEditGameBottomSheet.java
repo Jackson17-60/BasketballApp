@@ -65,7 +65,6 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
     private FirebaseAuth auth;
     private ActivityResultLauncher<String> launcher;
 
-    private ProgressBar loadingIndicator;
     private FirebaseDatabase database;
     private Game existingGame;
     public CreateEditGameBottomSheet() {
@@ -117,13 +116,9 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
             populateFieldsForEditing(existingGame);
         }
     }
-    private void showLoadingIndicator() {
-        loadingIndicator.setVisibility(View.VISIBLE);
-    }
 
-    private void hideLoadingIndicator() {
-        loadingIndicator.setVisibility(View.GONE);
-    }
+
+
     private void setupClickListeners(View rootView) {
         LinearLayout datePickerLayout = rootView.findViewById(R.id.datePickerLayout);
         LinearLayout timePickerLayout = rootView.findViewById(R.id.timePickerLayout);
@@ -172,15 +167,12 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         if (newGameRef.getKey() != null) {
             newGame.setGameID(newGameRef.getKey());
         }
-        showLoadingIndicator();
         newGameRef.setValue(gameData)
                 .addOnSuccessListener(aVoid -> {
-                    hideLoadingIndicator();
                     Toast.makeText(requireContext(), SUCCESS_MESSAGE, Toast.LENGTH_SHORT).show();
                     dismiss();
                 })
                 .addOnFailureListener(e -> {
-                    hideLoadingIndicator();
                     Log.e("AddGame", "Failed to create the game", e);
                     Toast.makeText(requireContext(), FAILURE_MESSAGE, Toast.LENGTH_SHORT).show();
                 });
@@ -418,15 +410,12 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
 
     private void deleteGameFromDatabase() {
         if (existingGame != null) {
-            showLoadingIndicator();
             gamesReference.child(existingGame.getGameID()).removeValue()
                     .addOnSuccessListener(aVoid -> {
-                        hideLoadingIndicator();
                         Toast.makeText(requireContext(), "Game deleted successfully", Toast.LENGTH_SHORT).show();
                         dismiss();
                     })
                     .addOnFailureListener(e -> {
-                        hideLoadingIndicator();
                         Toast.makeText(requireContext(), "Failed to delete the game", Toast.LENGTH_SHORT).show();
                     });
         }
@@ -487,7 +476,6 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         dateTv = null;
         timeTv = null;
         gameStatus = null;
-        loadingIndicator = null;
     }
     @Override
     public void onPause() {

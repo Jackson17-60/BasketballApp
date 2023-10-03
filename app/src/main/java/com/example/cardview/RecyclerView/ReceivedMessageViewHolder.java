@@ -1,5 +1,7 @@
 package com.example.cardview.RecyclerView;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +28,7 @@ public class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         binding.receivedTV.setText(messageText);
         binding.senderName.setText(senderNameText);
         binding.receivedTimeStamp.setText(timeStamp);
-
+        Log.d("binding","binding"+imageUrl);
         Glide.with(binding.getRoot().getContext())
                 .load(imageUrl)
                 .placeholder(R.drawable.upload)

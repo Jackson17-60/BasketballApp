@@ -100,7 +100,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMyLocationButtonClick() {
         updateLocation();
-        Log.d("fuck","test");
         return false;
     }
     private void setupMapListeners() {

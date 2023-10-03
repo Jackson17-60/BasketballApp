@@ -84,6 +84,7 @@ public class ChatRecylerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     if (user != null) {
+                        Log.d("user profile img","pro img"+user.getprofileImg());
                         receiveViewHolder.bind(message.getMessageText(), user.getName(), formattedTime, user.getprofileImg());
                     }
                 }
@@ -101,7 +102,7 @@ public class ChatRecylerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
         if (holder instanceof ReceivedMessageViewHolder) {
-            ((ReceivedMessageViewHolder) holder).cleanup();
+//            ((ReceivedMessageViewHolder) holder).cleanup();
         }
     }
 

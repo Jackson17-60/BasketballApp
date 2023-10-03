@@ -84,7 +84,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore:24.7.1")
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
-    debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.7")
+//    debugImplementation ("com.squareup.leakcanary:leakcanary-android:2.7")
     implementation ("com.google.firebase:firebase-messaging:23.2.1")
 
 
