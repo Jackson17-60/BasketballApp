@@ -25,11 +25,15 @@ Our app addresses these challenges by:
 2. Providing scheduling tools to organize games.
 3. Matching players based on skill level preferences.
 
+## 🛠 Tools Used
+
+- 🔥 **Firebase**: Real-time database, authentication, and serverless backend.
+- 🌍 **Google Maps API**: Geographical data integration and map visualization.
+- 🎯 **Android Studio**: Primary development environment for the application.
+- ☕ **Java**: Primary programming language used for development.
+
 ## 🔧 Technical Highlights
 
 - 🗄️ **Database**: Leveraged Firebase for real-time data updates, authentication, scalability, and serverless backend functionalities.
 - 🌍 **Mapping**: Integrated Google Maps API for comprehensive geographical data, high-quality imagery, and customization options.
 
-## 🛠 Support & Contribution
-
-For any issues, suggestions, or contribution opportunities, please refer to our [issue tracker](<Link-to-your-GitHub-issues-page>). We appreciate the community's support in making this platform the go-to solution for basketball enthusiasts everywhere!
