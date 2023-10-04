@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +50,8 @@ import java.util.Map;
 
 import com.example.cardview.Model_Class.Game;
 
+import kotlin.Triple;
+
 
 public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
     private static final String SUCCESS_MESSAGE = "Successfully created the game";
@@ -63,8 +64,8 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
     private DatabaseReference gamesReference;
     private FirebaseUser user;
     private FirebaseAuth auth;
-    private ActivityResultLauncher<String> launcher;
-
+    private ActivityResultLauncher<Triple<String, Double, Double>> launcher;
+    private Double selectedLong,selectedLat;
     private FirebaseDatabase database;
     private Game existingGame;
     public CreateEditGameBottomSheet() {
@@ -82,26 +83,36 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         user = auth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
         gamesReference = database.getReference().child("games");
-        launcher = registerForActivityResult(new ActivityResultContract<String, String>() {   @NonNull
-        @Override
-        public Intent createIntent(@NonNull Context context, String input) {
-            Intent intent = new Intent(context, MapsActivity.class);
-            intent.putExtra("selected_location", input);
-            return intent;
-        }
+        launcher = registerForActivityResult(new ActivityResultContract<Triple<String, Double, Double>, Triple<String, Double, Double>>() {
+            @NonNull
             @Override
-            public String parseResult(int resultCode, @Nullable Intent intent) {
+            public Intent createIntent(@NonNull Context context, Triple<String, Double, Double> input) {
+                Intent intent = new Intent(context, MapsActivity.class);
+                intent.putExtra("selected_location", input.getFirst());
+                intent.putExtra("selectedLat", input.getSecond());
+                intent.putExtra("selectedLong", input.getThird());
+                return intent;
+            }
+
+            @Override
+            public Triple<String, Double, Double> parseResult(int resultCode, @Nullable Intent intent) {
                 if (intent == null || resultCode != Activity.RESULT_OK) {
-                    return null; // or you might want to throw an exception
+                    return null;
                 }
-                return intent.getStringExtra("selected_location");
+                String location = intent.getStringExtra("selected_location");
+                Double Lat = intent.getDoubleExtra("selectedLat", 0);
+                Double Long = intent.getDoubleExtra("selectedLong", 0);
+                return new Triple<>(location, Lat, Long);
             }
         }, result -> {
             if (result != null) {
-                gameLocationTv.setText(result);
-                selectedLocation = result;
+                gameLocationTv.setText(result.getFirst());
+                selectedLocation = result.getFirst();
+                selectedLat = result.getSecond();
+                selectedLong = result.getThird();
             }
         });
+
     }
     private void initializeViews(View rootView) {
         levelRadioGroup = rootView.findViewById(R.id.gamelevelRadioGroup);
@@ -125,7 +136,7 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         LinearLayout gameLocationLayout = rootView.findViewById(R.id.gamesLocationLayout);
         datePickerLayout.setOnClickListener(this::handleDatePickerClick);
         timePickerLayout.setOnClickListener(this::handleTimePickerClick);
-        gameLocationLayout.setOnClickListener(v -> launcher.launch(selectedLocation));
+        gameLocationLayout.setOnClickListener(v -> launcher.launch(new Triple<>(selectedLocation, selectedLat, selectedLong)));
         addGameBtn.setOnClickListener(this::handleAddGameClick);
         deleteGameBtn.setOnClickListener(this::handleDeleteGameClick);
     }
@@ -145,6 +156,7 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         addDate = dateTv.getText().toString().trim();
         addTime = timeTv.getText().toString().trim();
         addGameLoc = gameLocationTv.getText().toString().trim();
+
         addPlayers = playersNeededET.getText().toString().trim();
         int selectedRadioButtonId = levelRadioGroup.getCheckedRadioButtonId();
 
@@ -155,7 +167,7 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
 
         DatabaseReference newGameRef = gamesReference.push();
         Map<String, Object> gameData = new HashMap<>();
-        Game newGame = new Game(newGameRef.getKey(), addDate, addTime, addGameLoc, selectedLevel, addPlayers,1L, user != null ? user.getUid() : null);
+        Game newGame = new Game(newGameRef.getKey(), addDate, addTime, addGameLoc,selectedLat,selectedLong, selectedLevel, addPlayers,1L, user != null ? user.getUid() : null);
         gameData.put("details", newGame);
 
         if (user != null) {
@@ -366,6 +378,8 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         timeTv.setText(game.getTime());
         gameLocationTv.setText(game.getLocation());
         selectedLocation = game.getLocation();
+        selectedLat = game.getLat();
+        selectedLong = game.getLong();
         playersNeededET.setText(game.getNumOfPlayer() != null ? String.valueOf(game.getNumOfPlayer()) : "");
 
 

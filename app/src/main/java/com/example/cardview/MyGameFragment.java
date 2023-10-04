@@ -152,7 +152,6 @@ public class MyGameFragment extends Fragment implements GameRecyclerViewAdapter.
         }
     }
     private void handleChildChanged(@NonNull DataSnapshot dataSnapshot) {
-        Log.d("test bro","test");
         String gameId = dataSnapshot.getKey();
         DataSnapshot detailsSnapshot = dataSnapshot.child("details");
         Game game = detailsSnapshot.getValue(Game.class);

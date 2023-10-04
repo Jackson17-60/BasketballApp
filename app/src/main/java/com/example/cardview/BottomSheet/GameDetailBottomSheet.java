@@ -32,11 +32,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 import com.example.cardview.Model_Class.Game;
 
 public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
-    private String name;
+    private String name,selectedaddress;
     private Game game;
     private TextView playerTextView, dateTextView, timeTextView, levelTextView, locationTextView, hostTextView;
 
@@ -71,31 +72,30 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
          hostTextView = view.findViewById(R.id.game_detail_host);
         mapPreviewImageView = view.findViewById(R.id.mapImageView);
         open_googlemapBtn = view.findViewById(R.id.open_googlemapBtn);
-        String address = game.getLocation();
-        String apiKey = "AIzaSyBZVfsU9RWTh04vxBS5gHX5XQd2jvBSQtY"; // replace with your actual API key
 
-        try {
-            // Encode the address to be used in a URL
-            String encodedAddress = URLEncoder.encode(address, "UTF-8");
+        selectedaddress = game.getLocation();
+        Double selectedlat = game.getLat();
+        Double selectedlong = game.getLong();
+        String apiKey = "AIzaSyBZVfsU9RWTh04vxBS5gHX5XQd2jvBSQtY";
 
-            // Create the URL string using the encoded address and API key
-            String urlString = String.format(
-                    "https://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=20&size=500x200&markers=color:blue%%7Clabel:S%%7C%s&key=%s",
-                    encodedAddress,
-                    encodedAddress,
-                    apiKey
-            );
 
-            // Now you have the URL string that you can use to load the image or open in a browser
-            Glide.with(this)
-                    .load(urlString)
-                    .into(mapPreviewImageView);
+        String urlString = String.format(
+                Locale.US,
+                "https://maps.googleapis.com/maps/api/staticmap?center=%f,%f&zoom=20&size=500x200&markers=color:blue%%7Clabel:S%%7C%f,%f&key=%s",
+                selectedlat,
+                selectedlong,
+                selectedlat,
+                selectedlong,
+                apiKey
+        );
 
-            open_googlemapBtn.setOnClickListener(view1 -> openInGoogleMaps(urlString));
+        Glide.with(this)
+                .load(urlString)
+                .into(mapPreviewImageView);
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        open_googlemapBtn.setOnClickListener(view1 -> openInGoogleMaps(selectedlat, selectedlong));
+
+
 
         dateTextView.setText(game.getDate());
         timeTextView.setText(game.getTime());
@@ -240,19 +240,22 @@ public class GameDetailBottomSheet  extends BottomSheetDialogFragment {
         String par = game.getParticipantCount() + "/" + game.getNumOfPlayer();
         playerTextView.setText(par);
     }
-    private void openInGoogleMaps(String address) {
-        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(address));
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+
+
+    private void openInGoogleMaps(double latitude, double longitude) {
+        String strUri = "http://maps.google.com/maps?q=loc:" + latitude + "," + longitude + " (" + selectedaddress + ")";
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(strUri));
         mapIntent.setPackage("com.google.android.apps.maps");
         Activity activity = getActivity();
         if (activity != null && mapIntent.resolveActivity(activity.getPackageManager()) != null) {
             startActivity(mapIntent);
-        }else {
-            if(isAdded()){
+        } else {
+            if (isAdded()) {
                 Toast.makeText(requireContext(), "Google Maps is not installed", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

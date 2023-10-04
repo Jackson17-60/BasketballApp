@@ -40,6 +40,7 @@ import java.util.Locale;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
 
     private Geocoder geocoder;
+    private  LatLng latLngselected;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private Marker currentMarker;
@@ -70,10 +71,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Intent intent = getIntent();
         String selectedLocation = intent.getStringExtra("selected_location");
-        Log.d("selected_location","fuck my ass"+selectedLocation);
-        if (selectedLocation != null) {
-            performSearch(selectedLocation);
+        double selectedlat = intent.getDoubleExtra("selectedLat",0);
+        double selectedlong = intent.getDoubleExtra("selectedLong",0);
+        if (selectedlat != 0 && selectedlong != 0) {
+            performSearchWithLatLng(selectedlat,selectedlong);
         }
+
     }
 
     @Override
@@ -146,6 +149,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (location != null) {
                         currentLocation = location;
                         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        latLngselected = latLng;
                         updateMarker(latLng, "Your location");
 
                         geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1, new Geocoder.GeocodeListener() {
@@ -172,6 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void performSearch(String query) {
         geocodeLocationName(query, 1, (latLng, addressText) -> {
             if (latLng != null && addressText != null) {
+                latLngselected = latLng;
                 updateMarker(latLng, addressText);
             } else {
                 Toast.makeText(MapsActivity.this, "No location found for the query", Toast.LENGTH_SHORT).show();
@@ -179,6 +184,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    private void performSearchWithLatLng(double latitude, double longitude) {
+        LatLng latLng = new LatLng(latitude, longitude);
+        geocodeLocation(latLng, (resultLatLng, addressText) -> {
+            if (addressText != null) {
+                updateMarker(resultLatLng, addressText);
+            } else {
+                Toast.makeText(MapsActivity.this, "No location found for the given coordinates", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
     private void setupSearchView() {
@@ -223,6 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Address address = addresses.get(0);
                     String addressText = address.getAddressLine(0);
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    latLngselected = latLng;
                     runOnUiThread(() -> callback.onGeocodeResult(latLng, addressText));
                 } else {
                     runOnUiThread(() -> callback.onGeocodeResult(null, null));
@@ -244,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (!addresses.isEmpty()) {
                     Address address = addresses.get(0);
                     String addressText = address.getAddressLine(0);
+                    latLngselected = latLng;
                     runOnUiThread(() -> callback.onGeocodeResult(latLng, addressText));
                 } else {
                     runOnUiThread(() -> callback.onGeocodeResult(null, null));
@@ -262,15 +279,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void confirmSelection() {
         String selectedLocationText = text_selected_location.getText().toString();
 
-        if (!selectedLocationText.isEmpty()) {
+        if (latLngselected == null) {
+            Toast.makeText(this, "Location not selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!selectedLocationText.isEmpty() && latLngselected.latitude != 0 && latLngselected.longitude != 0) {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("selected_location", selectedLocationText);
+            resultIntent.putExtra("selectedLat", latLngselected.latitude);
+            resultIntent.putExtra("selectedLong",latLngselected.longitude);
             setResult(Activity.RESULT_OK, resultIntent);
             finish();
         } else {
             Toast.makeText(this, "No location selected", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -1,5 +1,7 @@
 package com.example.cardview.Model_Class;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.sql.Time;
 import java.util.Date;
 
@@ -11,6 +13,8 @@ public class Game {
     private String date;
     private String time;
     private String location;
+    private Double Lat;
+    private Double Long;
     private String level;
     private String numOfPlayer;
 
@@ -23,16 +27,23 @@ public class Game {
     }
 
 
-    public Game(String gameID,String date, String time, String location, String level, String numOfPlayer,long participantCount, String host) {
+    public Game(String gameID,String date, String time, String location,Double Lat, Double Long, String level, String numOfPlayer,long participantCount, String host) {
         this.gameID = gameID;
         this.date = date;
         this.time = time;
         this.location = location;
+        this.Long = Long;
+        this.Lat = Lat;
         this.level = level;
         this.numOfPlayer = numOfPlayer;
         this.participantCount = participantCount;
         this.host = host;
     }
+    public Double getLat(){ return Lat;}
+    public void setLat(Double Lat){this.Lat = Lat;}
+
+    public Double getLong(){ return Long;}
+    public void setLong(Double Long){this.Long = Long;}
     public long getParticipantCount() {
         return participantCount;
     }
