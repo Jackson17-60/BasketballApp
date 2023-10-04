@@ -216,6 +216,8 @@ public class CreateEditGameBottomSheet extends BottomSheetDialogFragment {
         existingGame.setLocation(addGameLoc);
         existingGame.setNumOfPlayer(addPlayers);
         existingGame.setLevel(selectedLevel);
+        existingGame.setLat(selectedLat);
+        existingGame.setLong(selectedLong);
 
         // Update the existing game details in the database
         DatabaseReference existingGameRef = gamesReference.child(existingGame.getGameID());
